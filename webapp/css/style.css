@@ -1,0 +1,178 @@
+/* Enter your custom styles here */
+.sapMListTblCell.cellBorderRight {
+	border-right: 1px solid lightgray;
+}
+/*.sapMListTblCell.cellBorderLeft {*/
+/*	border-left: 1px solid lightgray;*/
+/*}*/
+
+.formheader .sapUiFormTitle.sapUiFormTitleH4 {
+  height: 0rem;
+  padding-bottom: 0rem;
+}
+
+.myForm.sapUiForm:not(.sapUiFormEdit) .sapUiFormCLSmallColumns .sapUiFormCLElement{
+    padding:0rem
+}
+
+.formContent.sapUiRespGrid.sapUiRespGridMedia-Std-Phone.sapUiRespGridHSpace0.sapUiRespGridVSpace0.sapUiFormResGridMain.sapUiRespGridOverflowHidden {
+  padding: 0rem;
+  padding-top: 0rem;
+
+}
+
+.sapMLIBShowSeparator>td {
+    border-top: 1px solid #e5e5e5;
+    border-left:  1px solid lightgray;
+}
+.sapMTableTH {
+    background: #f7f7f7;
+    border-bottom: 1px solid #e5e5e5;
+    vertical-align: middle;
+    border-left: 1px solid lightgray;
+}
+
+.sapUiCompFilterBar .sapUiAFLayoutItem, .sapUiCompFilterBar .sapUiAFLayoutEnd {
+    margin-top: 0rem;
+}
+
+/*.sapMColumnHeader {*/
+/*    display: flex;*/
+/*    flex: 1 1 auto;*/
+/*     padding: 0; */
+/*}*/
+/*.sapMListTblNavCol, .sapMListTblCell {*/
+/*    vertical-align: middle;*/
+/*}*/
+/*.sapMBtnGhost {*/
+/*    background-image: none;*/
+/*    border-color: rgba(52,97,135,0.5);*/
+/*    background-color: transparent;*/
+/*    color: #333;*/
+/*}*/
+/*.sapMBtnBack, .sapMBtnTransparent {*/
+/*    background-image: none;*/
+/*    background-color: transparent;*/
+/*    border-color: transparent;*/
+/*    color: #333;*/
+/*}*/
+
+.toolbarstyle .sapMBtnInner{
+	vertical-align: top;
+    -webkit-appearance: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    box-sizing: content-box;
+    font-family: "72","72full",Arial,Helvetica,sans-serif;
+    font-size: 0.875rem;
+    height: 1.800rem;
+     min-width: 2.500rem; 
+    margin: 0;
+    padding: 0.8;
+    text-align: center;
+    position: relative;
+    background-color: #f7f7f7;
+    border: .0625rem solid #ababab;
+    border-radius: 0.2rem;
+    color: #346187;
+    text-shadow: 0 0 0.125rem #fff;
+}
+.resendbtn .sapMBtnInner{
+	vertical-align: top;
+    -webkit-appearance: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    box-sizing: content-box;
+    font-family: "72","72full",Arial,Helvetica,sans-serif;
+    font-size: 0.85rem;
+    height: 1.800rem;
+     min-width: 2.500rem; 
+    margin: 0;
+    padding: 0.8;
+    text-align: center;
+    position: relative;
+    background-color: #f7f7f7;
+    border: .0625rem solid #ababab;
+    border-radius: 0.2rem;
+    color: #346187;
+    text-shadow: 0 0 0.125rem #fff;
+}
+    
+  .toolbarstyle .sapMBtnContent {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: top;
+    line-height: 2.075rem;
+}
+  .resendbtn .sapMBtnContent {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: top;
+    line-height: 2.075rem;
+}
+/*.resendbtn .sapMBtnInner.sapMBtnEmphasized {*/
+/*    background-image: none;*/
+/*    background-color: red;*/
+    /* border-color: #418ac7; */
+/*    color: #fff;*/
+    /* text-shadow: 0 0 0.125rem rgba(0,0,0,0.5); */
+/*}*/
+/*.sapMListHdrText {*/
+/*    overflow: hidden;*/
+/*    white-space: nowrap;*/
+/*    text-overflow: ellipsis;*/
+/*    box-sizing: border-box;*/
+/*    font-size: 1.25rem;*/
+/*    font-family: "72","72full",Arial,Helvetica,sans-serif;*/
+/*    color: #333;*/
+/*    height: 3rem;*/
+/*    line-height: 3rem;*/
+/*     padding: 0 ; */
+/*    background-color: transparent;*/
+/*    border-bottom: 1px solid #ccc;*/
+/*}*/
+/*html.sap-tablet .sapMDialog, html.sap-desktop .sapMDialog {*/
+/*     min-width: 50rem; */
+/*}*/
+html.sap-desktop .sapMDialog.newtagdialogsytle {
+     min-width: 40rem; 
+}
+
+html.sap-desktop .sapMDialog.checktagdialogstyle {
+     min-width: 50rem; 
+}
+
+.sapMTB-Transparent-CTX.sapMTB {
+     padding-left: 0rem; 
+}
+.checkresultng{
+	    color: red;
+	        font-size: 2.3rem
+}
+.checkresultok{
+	    color: blue;
+	        font-size: 2.3rem
+}
+/*.sapMTB {*/
+/*    white-space: nowrap;*/
+/*    overflow: hidden;*/
+/*    -webkit-align-items: center;*/
+/*    -webkit-box-align: center;*/
+/*    align-items: center;*/
+/*    box-sizing: border-box;*/
+/*    -webkit-text-size-adjust: none;*/
+/*    -moz-text-size-adjust: none;*/
+/*    -ms-text-size-adjust: none;*/
+/*    height: 3rem;*/
+/*    background: #fafafa;*/
+/*}*/
