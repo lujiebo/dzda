@@ -141,6 +141,15 @@ sap.ui.define([
 					onSearchData.DZDALB = item.KEY1;
 					this._oParentView.setModel(new JSONModel(onSearchData), oModelName);
 					break;
+				case "DZDAMKUP":
+					onSearchData.DZDAMKUP = item.KEY1;
+					this._oParentView.setModel(new JSONModel(onSearchData), oModelName);
+					break;
+				case "DZDALBUP":
+					onSearchData.DZDALBUP = item.KEY1;
+					onSearchData.DZDALBTUP = item.VALUE1;
+					this._oParentView.setModel(new JSONModel(onSearchData), oModelName);
+					break;
 			}
 
 			this._oViewModel.setProperty("/searchHelp/KEY1", "");

@@ -1,0 +1,52 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:u="sap.ui.unified"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core">
+    <Dialog title="电子档案上传" type="Standard"  id="UpdateEWMForm" contentWidth="700px" contentHeight="800px">
+        <f:SimpleForm 
+			singleContainerFullSize="true" >
+            <f:content>
+                <Label text="员工编号" />
+                <Input id="Pernr" value="{updateEWM>/select}"/>
+            </f:content>
+            <f:content>
+                <Label text="电子档案模块" />
+                <Input id="DZDAMKUP" value="{onSearch>/DZDAMKUP}" submit="DzdamkKSubmit" showValueHelp="true" valueHelpRequest="ValueHelp"
+												editable="{onSearch>/oEditable}"  placeholder="电子档案模块"/>
+            </f:content>
+            <f:content>
+                <Label text="电子档案类别" />
+                <Input id="DZDALBUP" value="{onSearch>/DZDALBUP}" submit="DzdamkKSubmit" showValueHelp="true" valueHelpRequest="ValueHelp"
+												editable="{onSearch>/oEditable}"  placeholder="电子档案模块"/>
+            </f:content>
+            <f:content>
+                <Label text="电子档案上传" />
+                <u:FileUploader id="fileUploader" name="myFileUpload" 
+                    uploadUrl="/sap/opu/odata/sap/ZSY_HR_DZDA_SRV/ZSY_HR_FILESet" 
+                    multiple="true"
+                    tooltip="电子档案上传"
+			        uploadComplete="onUploadComplete" change="handleValueChange" 
+                    typeMissmatch="handleTypeMissmatch" uploadStart="handleBeforeUpload"
+			        sendXHR="true" style="Emphasized" placeholder="单击此处或浏览按钮上传文件" width="350px">
+                    <u:parameters>
+                        <u:FileUploaderParameter name="param1" value="Foo"/>
+                        <u:FileUploaderParameter name="param2" value="bar"/>
+                    </u:parameters>
+                    <u:headerParameters>
+                        <u:FileUploaderParameter name="headerParam1" value="Foo"/>
+                        <u:FileUploaderParameter name="headerParam2" value="bar"/>
+                    </u:headerParameters>
+                </u:FileUploader>
+            </f:content>
+        </f:SimpleForm>
+        <core:Fragment fragmentName="com/shunyu/dzda/view/FileView" type="XML"></core:Fragment>
+        <Label class="attachWidth"/>
+        <beginButton>
+            <Button id="attachButton" icon="sap-icon://accept" text="确定" type="Accept" press="onDialogImageOk"/>
+        </beginButton>
+        <endButton>
+            <Button id="ToolBarButton" icon="sap-icon://accept" text="取消" type="Accept" press="onDialogImageCancel"/>
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

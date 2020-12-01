@@ -57,7 +57,10 @@ sap.ui.define([
 					PERSG:"",
 					PERSK:"",
 					DZDAMK:"",
-					DZDALB:""
+					DZDALB:"",
+					DZDAMKUP:"",
+					DZDALBUP:"",
+					DZDALBTUP:""
 				}
 			};
 

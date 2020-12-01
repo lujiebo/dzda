@@ -18,7 +18,7 @@
         <f:header>
             <f:DynamicPageHeader>
                 <f:content>
-                    <fb:FilterBar search="onSearch" useToolbar="false" showRestoreButton="false" showClearButton="true"
+                    <fb:FilterBar search="onSearch" useToolbar="false"
 							showGoOnFB="true" showFilterConfiguration="false" id="tagfilter">
                         <fb:filterItems>
                             <fb:FilterItem name="pernr" label="{i18n>TitlePrePernr}">
@@ -30,37 +30,37 @@
                             <fb:FilterItem name="werks"  label="{i18n>TitleWERKS}">
                                 <fb:control>
                                     <Input id="WERKS" value="{onSearch>/WERKS}" submit="WerksSubmit" showValueHelp="true" valueHelpRequest="ValueHelp"
-												editable="{onSearch>/oEditable}" maxLength="4" placeholder="人事范围" required="true"/>
+												editable="{onSearch>/oEditable}"  placeholder="人事范围" required="true"/>
                                 </fb:control>
                             </fb:FilterItem>
                             <fb:FilterItem name="btrtl"  label="{i18n>TitleBTRTL}">
                                 <fb:control>
                                     <Input id="BTRTL" value="{onSearch>/BTRTL}" submit="BtrtlSubmit" showValueHelp="true" valueHelpRequest="ValueHelp"
-												editable="{onSearch>/oEditable}" maxLength="4" placeholder="人事子范围"/>
+												editable="{onSearch>/oEditable}"  placeholder="人事子范围"/>
                                 </fb:control>
                             </fb:FilterItem>
                             <fb:FilterItem name="persg" label="{i18n>TitlePERSG}" >
                                 <fb:control>
                                     <Input id="PERSG" value="{onSearch>/PERSG}" submit="PersgSubmit" showValueHelp="true" valueHelpRequest="ValueHelp"
-												editable="{onSearch>/oEditable}" maxLength="1" placeholder="员工组"/>
+												editable="{onSearch>/oEditable}"  placeholder="员工组"/>
                                 </fb:control>
                             </fb:FilterItem>
                             <fb:FilterItem name="persk" label="{i18n>TitlePERSK}">
                                 <fb:control>
                                     <Input id="PERSK" value="{onSearch>/PERSK}" submit="PerskSubmit" showValueHelp="true" valueHelpRequest="ValueHelp"
-												editable="{onSearch>/oEditable}" maxLength="2" placeholder="员工子组"/>
+												editable="{onSearch>/oEditable}"  placeholder="员工子组"/>
                                 </fb:control>
                             </fb:FilterItem>
                             <fb:FilterItem name="dzdamk" label="{i18n>TitleDZDAMK}">
                                 <fb:control>
                                     <Input id="DZDAMK" value="{onSearch>/DZDAMK}" submit="DzdamkKSubmit" showValueHelp="true" valueHelpRequest="ValueHelp"
-												editable="{onSearch>/oEditable}" maxLength="2" placeholder="电子档案模块"/>
+												editable="{onSearch>/oEditable}"  placeholder="电子档案模块"/>
                                 </fb:control>
                             </fb:FilterItem>
                             <fb:FilterItem name="dzdalb" label="{i18n>TitleDZDALB}">
                                 <fb:control>
                                     <Input id="DZDALB" value="{onSearch>/DZDALB}" submit="DzdalbKSubmit" showValueHelp="true" valueHelpRequest="ValueHelp"
-												editable="{onSearch>/oEditable}" maxLength="2" placeholder="电子档案类别"/>
+												editable="{onSearch>/oEditable}"  placeholder="电子档案类别"/>
                                 </fb:control>
                             </fb:FilterItem>
                             <fb:FilterItem name="dateStart" label="{i18n>dateStart}" class="datepos">
@@ -75,7 +75,7 @@
                                     </DatePicker>
                                 </fb:control>
                             </fb:FilterItem>
-                            <!-- <fb:FilterItem name="batch5" label="{i18n>IndexView.GyStatus}"><fb:control><ComboBox id="s_gyzt" showSecondaryValues="true" 
+                            <!-- <fb:FilterItem name="gyzt" label="{i18n>IndexView.GyStatus}"><fb:control><ComboBox id="s_gyzt" showSecondaryValues="true" 
 											selectedKey="3"
 											items="{ path: 'searchModel>/list', templateShareable:false }"><core:ListItem key="{searchModel>key}" text="{searchModel>value}" /></ComboBox></fb:control></fb:FilterItem> -->
                         </fb:filterItems>
@@ -85,7 +85,8 @@
         </f:header>
         <f:content>
             <u:Table id="table" selectionMode="MultiToggle" visibleRowCount="15" rowActionCount="1" 
-                        rows="{path: 'oKcmxList>/kcmxlist'}" ariaLabelledBy="title" class="custTable"
+                            visibleRowCountMode="Auto"
+                        rows="{path: 'oDzda>/dzdalist'}" ariaLabelledBy="title" class="sapUiSmallMarginBeginEnd"
 						>
                 <u:extension>
                     <OverflowToolbar>
@@ -101,37 +102,38 @@
                 </u:extension>
                 <u:columns>
                     <u:Column>
-                        <Label text="{i18n>IndexView.Seq}" />
+                        <Label text="{i18n>IndexView.Seq}"/>
                         <u:template>
-                            <Text text="{oKcmxList>Matnr}"></Text>
+                            <Text text="{oDzda>Seq}"></Text>
                         </u:template>
                     </u:Column>
                     <u:Column>
                         <Label text="{i18n>TitlePrePernr}" />
                         <u:template>
-                            <Text text="{oKcmxList>Maktx}"></Text>
+                            <Text text="{oDzda>Pernr}"></Text>
                         </u:template>
                     </u:Column>
                     <u:Column>
                         <Label text="{i18n>IndexView.Name}" />
                         <u:template>
-                            <Text text="{oKcmxList>Maktx}"></Text>
+                            <Text text="{oDzda>ZhrDamc}"></Text>
                         </u:template>
                     </u:Column>
                     <u:Column>
                         <Label text="{i18n>TitleDZDAMK}" />
                         <u:template>
-                            <Text text="{oKcmxList>Maktx}"></Text>
+                            <Text text="{oDzda>ZhrMkDesc}"></Text>
                         </u:template>
                     </u:Column>
                     <u:Column>
                         <Label text="{i18n>TitleDZDALB}" />
                         <u:template>
-                            <Text text="{oKcmxList>Maktx}"></Text>
+                            <Text text="{oDzda>ZhrDzdalbDesc}"></Text>
                         </u:template>
                     </u:Column>
                 </u:columns>
             </u:Table>
         </f:content>
     </f:DynamicPage>
+	<!-- <core:Fragment fragmentName="com/shunyu/dzda/view/FileUpload" type="XML"></core:Fragment> -->
 </mvc:View>

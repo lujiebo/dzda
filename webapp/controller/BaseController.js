@@ -100,7 +100,28 @@ sap.ui.define([
     setBusy: function(b) {
 			this.getModel().setProperty("/appProperties/busy", b);
 		},
-
+		createFileTable: function(oEvent) {
+			var FileTable = [{
+				FileType: '01',
+				FileDesc: '身份证复印件'
+			}, {
+				FileType: '02',
+				FileDesc: '毕业证复印件'
+			}, {
+				FileType: '03',
+				FileDesc: '学位证复印件'
+			}, {
+				FileType: '04',
+				FileDesc: '上家单位离职证明'
+			}, {
+				FileType: '05',
+				FileDesc: '白底证件照片'
+			}, {
+				FileType: '06',
+				FileDesc: '体检报告'
+			}];
+			return FileTable;
+		}
   });
 
 });

@@ -22,8 +22,8 @@
                     "localUri": "localService/metadata.xml"
                 }
             },
-			"ZSY_HR_DZQZ_SRV": {
-				"uri": "/sap/opu/odata/sap/ZSY_HR_DZQZ_SRV/",
+			"ZSY_HR_DZDA_SRV": {
+				"uri": "/sap/opu/odata/sap/ZSY_HR_DZDA_SRV/",
 				"type": "OData",
 				"settings": {
 					"odataVersion": "2.0",
@@ -90,9 +90,9 @@
                 "dataSource": "ZSY_HR_COMMON_SH_SRV",
                 "preload": true
             },
-			"ZSY_HR_DZQZ_SRV":{
+			"ZSY_HR_DZDA_SRV":{
 				"type": "sap.ui.model.odata.v2.ODataModel",
-				"dataSource": "ZSY_HR_DZQZ_SRV",
+				"dataSource": "ZSY_HR_DZDA_SRV",
 				"defaultBindingMode": "TwoWay"
 			}
 		},
