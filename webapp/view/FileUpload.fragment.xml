@@ -3,12 +3,12 @@
     xmlns:u="sap.ui.unified"
     xmlns:f="sap.ui.layout.form"
     xmlns:core="sap.ui.core">
-    <Dialog title="电子档案上传" type="Standard"  id="UpdateEWMForm" contentWidth="700px" contentHeight="800px">
+    <Dialog title="电子档案上传" type="Standard"  id="UpdateEWMForm" contentWidth="1000px" contentHeight="800px">
         <f:SimpleForm 
 			singleContainerFullSize="true" >
             <f:content>
                 <Label text="员工编号" />
-                <Input id="Pernr" value="{updateEWM>/select}"/>
+                <Input id="PernrUp"/>
             </f:content>
             <f:content>
                 <Label text="电子档案模块" />
@@ -28,7 +28,7 @@
                     tooltip="电子档案上传"
 			        uploadComplete="onUploadComplete" change="handleValueChange" 
                     typeMissmatch="handleTypeMissmatch" uploadStart="handleBeforeUpload"
-			        sendXHR="true" style="Emphasized" placeholder="单击此处或浏览按钮上传文件" width="350px">
+			        sendXHR="true" style="Emphasized" placeholder="单击此处或浏览按钮上传文件" buttonOnly="false" buttonText="选择文件">
                     <u:parameters>
                         <u:FileUploaderParameter name="param1" value="Foo"/>
                         <u:FileUploaderParameter name="param2" value="bar"/>
@@ -46,7 +46,7 @@
             <Button id="attachButton" icon="sap-icon://accept" text="确定" type="Accept" press="onDialogImageOk"/>
         </beginButton>
         <endButton>
-            <Button id="ToolBarButton" icon="sap-icon://accept" text="取消" type="Accept" press="onDialogImageCancel"/>
+            <Button id="ToolBarButton" icon="sap-icon://decline" text="取消" type="Reject" press="onDialogImageCancel"/>
         </endButton>
     </Dialog>
 </core:FragmentDefinition>

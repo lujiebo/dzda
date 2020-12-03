@@ -104,7 +104,9 @@ sap.ui.define([
         PersgFilters = [], //员工组过滤器
         PerskFilters = [], //员工子组过滤器
         DzdamkFilters = [], //电子档案模块
-        DzdalbFilters = []; //电子档案类别
+        DzdalbFilters = [], //电子档案类别
+        BegdaFilters = [], //开始日期
+        EnddaFilters = []; //结束日期
 
       if (!Util.isNotNull(searchdata.WERKS)) {
         MessageToast.show("请选择人事范围!", {
@@ -113,37 +115,96 @@ sap.ui.define([
         return;
       }
 
-      // //如果批次不为空,批次过滤器
-      // if (Util.isNotNull(searchdata.mchb)) {
+      // 人事范围过滤器
+      WerkFilters.push(new sap.ui.model.Filter(
+        "Werks",
+        sap.ui.model.FilterOperator.EQ,
+        searchdata.WERKS
+      ));
+      aFilterGroupsFilters.push(new sap.ui.model.Filter(WerkFilters, true));
 
-      //   MchbFilters.push(new sap.ui.model.Filter(
-      //     "Charg",
-      //     sap.ui.model.FilterOperator.EQ,
-      //     searchdata.mchb
-      //   ));
-      //   aFilterGroupsFilters.push(new sap.ui.model.Filter(MchbFilters, true));
-      // }
+      //人事子范围
+      if (Util.isNotNull(searchdata.BTRTL)) {
+        BtrtlFilters.push(new sap.ui.model.Filter(
+          "Btrtl",
+          sap.ui.model.FilterOperator.EQ,
+          searchdata.BTRTL
+        ));
+        aFilterGroupsFilters.push(new sap.ui.model.Filter(BtrtlFilters, true));
+      }
 
-      // // 工厂过滤器
-      // WerkFilters.push(new sap.ui.model.Filter(
-      //   "Werks",
-      //   sap.ui.model.FilterOperator.EQ,
-      //   searchdata.werks
-      // ));
-      // aFilterGroupsFilters.push(new sap.ui.model.Filter(WerkFilters, true));
+      //员工组范围
+      if (Util.isNotNull(searchdata.PERSG)) {
+        PersgFilters.push(new sap.ui.model.Filter(
+          "Persg",
+          sap.ui.model.FilterOperator.EQ,
+          searchdata.PERSG
+        ));
+        aFilterGroupsFilters.push(new sap.ui.model.Filter(PersgFilters, true));
+      }
+
+      //员工子组
+      if (Util.isNotNull(searchdata.PERSK)) {
+        PerskFilters.push(new sap.ui.model.Filter(
+          "Persk",
+          sap.ui.model.FilterOperator.EQ,
+          searchdata.PERSK
+        ));
+        aFilterGroupsFilters.push(new sap.ui.model.Filter(PerskFilters, true));
+      }
+
+      //电子档案模块
+      if (Util.isNotNull(searchdata.DZDAMK)) {
+        DzdamkFilters.push(new sap.ui.model.Filter(
+          "Zhrmk",
+          sap.ui.model.FilterOperator.EQ,
+          searchdata.DZDAMK
+        ));
+        aFilterGroupsFilters.push(new sap.ui.model.Filter(DzdamkFilters, true));
+      }
+
+      //电子档案类别
+      if (Util.isNotNull(searchdata.DZDALB)) {
+        DzdalbFilters.push(new sap.ui.model.Filter(
+          "Zhrdzdalb",
+          sap.ui.model.FilterOperator.EQ,
+          searchdata.DZDALB
+        ));
+        aFilterGroupsFilters.push(new sap.ui.model.Filter(DzdalbFilters, true));
+      }
+
+      //进入集团日期
+      if (Util.isNotNull(this.byId("datePickerfrom").getValue())) {
+        BegdaFilters.push(new sap.ui.model.Filter(
+          "Ryend", //pa0000中的开始日期
+          sap.ui.model.FilterOperator.GE,
+          this.byId("datePickerfrom").getValue()
+        ));
+        aFilterGroupsFilters.push(new sap.ui.model.Filter(BegdaFilters, true));
+      }
+      //离开集团日期
+      if (Util.isNotNull(this.byId("datePickerTo").getValue())) {
+        EnddaFilters.push(new sap.ui.model.Filter(
+          "Rybeg", //pa0000中的结束日期
+          sap.ui.model.FilterOperator.LE,
+          this.byId("datePickerTo").getValue()
+        ));
+        aFilterGroupsFilters.push(new sap.ui.model.Filter(EnddaFilters, true));
+      }
+
 
       this.byId("table").setBusy(true);
       var oDzdaModel = this.getModel("ZSY_HR_DZDA_SRV");
       oDzdaModel.setUseBatch(false);
       oDzdaModel.read("/ZSY_HR_S_DZDASet", {
-        // filters: aFilterGroupsFilters,
+        filters: aFilterGroupsFilters,
         success: function (oData, oResponse) {
           this.changeIndex(oData.results)
 
           // this.clearSelection();
           var oDzda = new JSONModel({
             "dzdalist": oData.results
-          }); //库存明细
+          });
           oDzda.setSizeLimit(oData.results.length);
           this.setModel(oDzda, "oDzda");
           this.byId("table").setBusy(false);
@@ -282,196 +343,83 @@ sap.ui.define([
         item.Seq = i + 1;
       });
     },
-    handleBeforeUpload: function () {
-    },
-    onUploadComplete: function (oEvent) {
-    },
+    handleBeforeUpload: function () {},
+    onUploadComplete: function (oEvent) {},
     onDialogImageOk: function (params) {
-      // upload file
-      var oFileUploader = this.byId("fileUploader");
-
-      var file = jQuery.sap.domById(oFileUploader.getId() + "-fu").files[0];
-      this.oFile = file;
-      if (!oFileUploader.getValue()) {
-        MessageToast.show("请先上传文件");
+      var oFileTableData = this.getModel("MyFile");
+      var fileType = this.getModel("onSearch").getData().DZDALBUP;
+      var fileTypeT = this.getModel("onSearch").getData().DZDALBTUP; //所选的电子档案类别文本
+      var oEntity = {
+        Pernr: "",
+        ZSY_FILE_ISet: []
+      }
+      var pernrUp = this.byId("PernrUp").getValue(); //上传的工号
+      // var DzdaMkUP = this.byId("DzdaMkUP").getValue(); //上传的电子档案模块
+      var DZDALBUP = this.byId("DZDALBUP").getValue(); //上传的电子档案类别
+      if (!Util.isNotNull(DZDALBUP)) {
+        MessageToast.show("请选择电子档案类别!");
         return;
       }
-      this._get_csrf('ZSY_HR_FILESet');
-      try {
-        if (file) {
-          var that = this;
-
-          var _handleSuccess = function (event, xhr, settings, data) {
-            debugger;
-          };
-          var _handleError = function (data) {
-            debugger;
-            var errorMsg = '';
-            if (data.responseText[1]) {
-              errorMsg = /<message>(.*?)<\/message>/.exec(data.responseText)[1];
+      if (Util.isNotNull(pernrUp)) {
+        oEntity.Pernr = pernrUp;
+      } else { //工号为空则校验文件名称和类型是否符合
+        var aFile = this.getModel("MyFile").getData();
+        for (let i = 0; i < aFile.length; i++) {
+          const file = aFile[i];
+          if (file.ISICON == '') { //说明有工号不存在
+            MessageToast.show(file.FilenameOld + "的工号在主系统中不存在,请检查文档命名后再进行上传!");
+            break;
+          }
+          if (file.FilenameOld) {
+            var aNamelist = file.FilenameOld.split('_'); //拆分文件名称
+            if (aNamelist.length > 0) {
+              if (fileTypeT != aNamelist[1]) {
+                MessageToast.show(file.FilenameOld + "格式不正确,请检查文档命名后再进行上传!");
+                break;
+              }
             } else {
-              errorMsg = 'Something bad happened';
+              MessageToast.show(file.FilenameOld + "格式不正确,请检查文档命名后再进行上传!");
+              break;
             }
-            that.fireUploadComplete({
-              "response": "Error: " + errorMsg
-            });
-            that._bUploading = false;
-          };
-
-          var oHeaders = {
-            "x-csrf-token": this._csrfToken,
-            "slug": encodeURIComponent(file.name)
-          };
-          jQuery.ajax({
-            type: 'POST',
-            url: this._url,
-            headers: oHeaders,
-            cache: false,
-            contentType: file.type,
-            processData: false,
-            data: file,
-            dataType: "json",
-            success: _handleSuccess,
-            error: _handleError
-          });
-        }
-      } catch (oException) {
-        jQuery.sap.log.error("导入失败:\n" + oException.message);
-      }
-    },
-    onDialogImageOk1: function (oEvent) {
-      // upload file
-      var oFileUploader = this.byId("fileUploader");
-
-      var file = jQuery.sap.domById(oFileUploader.getId() + "-fu").files[0];
-      this.oFile = file;
-      if (!oFileUploader.getValue()) {
-        MessageToast.show("请先上传文件");
-        return;
-      }
-      if (file.name) {
-        var alist = file.name.split('_'); //拆分合同名称
-        if (alist.length > 0) {
-          var selDzdalbT = this.getModel("onSearch").getData().DZDALBTUP; //所选的电子档案类别文本
-          if (selDzdalbT != alist[1]) {
-            MessageToast.show("请检查文档命名后再进行上传!");
-            return;
-          }
-        } else {
-          MessageToast.show("请检查文档命名后再进行上传!");
-          return;
-        }
-      }
-      var oFileTableModel = this.getView().getModel("MyFile");
-      if (oFileTableModel != undefined) {
-        var oFileTableData = oFileTableModel.oData;
-        for (var i = 0; i < oFileTableData.length; i++) {
-          if (file.name == oFileTableData[i].FILENAME_OLD) {
-            this.ShowMessage(this._ResourceBundle.getText("oErrorFileName"));
-            return;
+          } else {
+            MessageToast.show(file.FilenameOld + "格式不正确,请检查文档命名后再进行上传!");
+            break;
           }
         }
       }
-      if (file) {
-        var that = this;
-        this.filename = file.name;
-        var sPath = "/ZSY_HR_FILESet";
-        var oReturnTable = {
-          PERNR: '10000015',
-          SYDATE: "",
-          FILETYPE: this.oUploadFileType,
-          SYTIME: "",
-          FILENAME: this.changeFileName(),
-          FILENAME_OLD: file.name,
-          MIMETYPE: "",
-          SYUNAME: "",
-          VALUE: "",
-          URL: ""
-        };
-        var oHeaders = {
-          "is_icon": '',
-          "FileType": file.type
-        };
-        this.oDataModelPreEntry.setHeaders(oHeaders);
-        this.oDataModelPreEntry.create(sPath, oReturnTable, { //
-          // filters: oFilters,
-          success: function (oData, oResponse) {
-            var oFileTableModel = that.getView().getModel("MyFile");
 
-            var oFileTableRow = {
-                PERNR: "",
-                FILETYPE: "",
-                FILENAME_OLD: "",
-                FILENAME: "",
-                MIMETYPE: "",
-                SYUNAME: "",
-                SYDATE: "",
-                SYTIME: "",
-                VALUE: "",
-                URL: ""
-              },
-              oFileTableData;
-            if (oFileTableModel != undefined) {
-              oFileTableData = oFileTableModel.oData;
-            } else {
-              oFileTableData = [];
-            }
-            oFileTableRow.PERNR = that.getModel("PersonInfo").oData.PERNR;
-            oFileTableRow.FILETYPE = that.oUploadFileType;
-            var oFileTypeList = that.filename.split('.'),
-              oFileTypeLength = oFileTypeList.length;
-            oFileTableRow.FILENAME = that.changeFileName() + '.' + oFileTypeList[oFileTypeLength - 1];
-            oFileTableRow.FILENAME_OLD = that.filename;
-            oFileTableRow.MIMETYPE = oData.MIMETYPE;
-            oFileTableRow.SYUNAME = oData.SYUNAME;
-            oFileTableRow.SYDATE = oData.SYDATE;
-            oFileTableRow.SYTIME = oData.SYTIME;
-            oFileTableRow.VALUE = oData.VALUE;
-            // var oReturnList = event.childNodes[0].children[6]["childNodes"];
-            // for (var i = 0; i < oReturnList.length; i++) {
-            // 	var oNodeName = oReturnList[i].nodeName,
-            // 		oNodeValue = oReturnList[i].childNodes[0];
+      var sPath = "/ZSY_FILE_HSet";
+      oEntity.ZSY_FILE_ISet = oFileTableData.getData();
+      for (let i = 0; i < oEntity.ZSY_FILE_ISet.length; i++) {
+        const element = oEntity.ZSY_FILE_ISet[i];
+        element.Filetype = fileType;
+        if (Util.isNotNull(oEntity.Pernr)) { //选择工号自动生成模板信息
+          var pernr8 = Util.PrefixInteger(oEntity.Pernr, 8); //工号补零
 
-            // 	var oFieldName = oNodeName.split(':')[1];
-            // 	switch (oFieldName) {
-            // 		case 'PERNR':
-            // 			oFileTableRow.PERNR = oNodeValue.data;
-            // 			break;
-            // 		case 'FILETYPE':
-            // 			oFileTableRow.FILETYPE = oNodeValue.data;
-            // 			break;
-            // 		case 'FILENAME':
-            // 			oFileTableRow.FILENAME = oNodeValue.data;
-            // 			break;
-            // 		case 'FILENAME_OLD':
-            // 			oFileTableRow.FILENAME_OLD = oNodeValue.data;
-            // 			break;
-            // 		case 'MIMETYPE':
-            // 			oFileTableRow.MIMETYPE = oNodeValue.data;
-            // 			break;
-            // 		case 'SYUNAME':
-            // 			oFileTableRow.SYUNAME = oNodeValue.data;
-            // 			break;
-            // 		case 'SYDATE':
-            // 			oFileTableRow.SYDATE = oNodeValue.data;
-            // 			break;
-            // 		case 'SYTIME':
-            // 			oFileTableRow.SYTIME = oNodeValue.data;
-            // 			break;
-            // 		case 'VALUE':
-            // 			oFileTableRow.VALUE = oNodeValue.data;
-            // 			break;
-            // 	}
-            // }
-            oFileTableData.push(oFileTableRow);
-            that.getView().setModel(new JSONModel(oFileTableData), "MyFile");
-
-          },
-          error: function (oError) {
-            console.log(oError)
-          }
-        });
+          var sIndex = element.FilenameOld.lastIndexOf("\.");
+          //截取最后一个/后的值
+          var filefix = element.FilenameOld.substring(sIndex, element.FilenameOld.length);
+          element.Filename = pernr8 + '_' + fileTypeT + '_' + element.Sydate + filefix;
+        } else { //不然就取上传文件名
+          var sIndex = element.FilenameOld.indexOf("_");
+          var pernr8 = Util.PrefixInteger(element.FilenameOld.substring(0, sIndex), 8);;
+          element.Filename = pernr8 + element.FilenameOld.substring(sIndex, element.FilenameOld.length);
+        }
       }
+      this.oDataModelPreEntry.create(sPath, oEntity, { //
+        success: function (oData, oResponse) {
+          // that.oBusyDialog.close();
+          if (oData.Type == 'E') {
+            that.ShowMessage(oData.Message);
+          } else {
+            // that.oInitCheckDialog.close();
+          }
+        }.bind(this),
+        error: function (oError) {
+          // that.oBusyDialog.close();
+          // that.oInitCheckDialog.close();
+        }
+      });
     },
     handleTypeMissmatch: function (oEvent) {
       var aFileTypes = oEvent.getSource().getFileType();
@@ -484,73 +432,101 @@ sap.ui.define([
         sSupportedFileTypes);
     },
     handleValueChange: function (oEvent) {
+      var oFileTableModel = this.getModel("MyFile"),
+        oFileTableData;
+      if (oFileTableModel != undefined) {
+        oFileTableData = oFileTableModel.oData;
+      } else {
+        oFileTableData = new Array();
+      }
       var oFileUploader = this.byId("fileUploader");
       var oDomRef = oFileUploader.getFocusDomRef();
-      var file = oDomRef.files[0];
+      var files = oDomRef.files;
+      // var file0 = oDomRef.files[0];
       if (!oFileUploader.getValue()) {
-        MessageToast.show("请先上传文件");
+        // MessageToast.show("请先上传文件");
         return;
       }
       this._get_csrf('ZSY_HR_FILESet');
-      try {
-        if (file) {
-          var that = this;
-
-          var _handleSuccess = function (event, xhr, settings, data) {
-            debugger;
-          };
-          var _handleError = function (data) {
-            debugger;
-            var errorMsg = '';
-            if (data.responseText[1]) {
-              errorMsg = /<message>(.*?)<\/message>/.exec(data.responseText)[1];
-            } else {
-              errorMsg = 'Something bad happened';
-            }
-            that.fireUploadComplete({
-              "response": "Error: " + errorMsg
-            });
-            that._bUploading = false;
-          };
-
-          var oHeaders = {
-            "x-csrf-token": this._csrfToken,
-            "slug": encodeURIComponent(file.name)
-          };
-          jQuery.ajax({
-            type: 'POST',
-            url: this._url,
-            async:false,
-            headers: oHeaders,
-            cache: false,
-            contentType: file.type,
-            processData: false,
-            data: file,
-            dataType: "json",
-            success: _handleSuccess,
-            error: _handleError
-          });
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        var filePernr = "";
+        if (file.name.indexOf('_') > -1) {
+          var aNamelist = file.name.split('_'); //拆分文件名称获取到第一个_前的工号
+          filePernr = aNamelist[0];
         }
-      } catch (oException) {
-        jQuery.sap.log.error("导入失败:\n" + oException.message);
+        try {
+          if (file) {
+            var oFileRow = {
+              Pernr: filePernr,
+              Sydate: "",
+              Filetype: "",
+              Sytime: "",
+              Filename: "",
+              FilenameOld: file.name,
+              Mimetype: "",
+              Syuname: "",
+              Value: "",
+              Url: "",
+              IsIcon: ""
+            };
+
+            var that = this;
+            var _handleSuccess = function (data, xhr, settings) {
+              var oReFile = data.d; //odata返回的文件流
+              oFileRow.Sydate = oReFile.Sydate;
+              oFileRow.Sytime = oReFile.Sytime;
+              oFileRow.Mimetype = oReFile.Mimetype;
+              oFileRow.Syuname = oReFile.Syuname;
+              oFileRow.Value = oReFile.Value;
+              oFileRow.IsIcon = oReFile.IsIcon; //用来判断该上传的文件名的工号在主系统中是否存在 X表示存在
+              oFileTableData.push(oFileRow)
+            };
+            var _handleError = function (data) {
+              debugger;
+              var errorMsg = '';
+              if (data.responseText[1]) {
+                errorMsg = /<message>(.*?)<\/message>/.exec(data.responseText)[1];
+              } else {
+                errorMsg = 'Something bad happened';
+              }
+              that.fireUploadComplete({
+                "response": "Error: " + errorMsg
+              });
+              that._bUploading = false;
+            };
+
+            var oHeaders = {
+              "x-csrf-token": this._csrfToken,
+              "slug": encodeURIComponent(file.name),
+              "pernr": filePernr
+            };
+            jQuery.ajax({
+              type: 'POST',
+              url: this._url,
+              async: false,
+              headers: oHeaders,
+              cache: false,
+              contentType: file.type,
+              processData: false,
+              data: file,
+              dataType: "json",
+              success: _handleSuccess,
+              error: _handleError
+            });
+          }
+        } catch (oException) {
+          jQuery.sap.log.error("导入失败:\n" + oException.message);
+        }
       }
-      // var oFileUploader = oEvent.getSource();
-      // oFileUploader.removeAllHeaderParameters();
-      // //x-csrf-token:
-      // oFileUploader.addHeaderParameter(new sap.ui.unified.FileUploaderParameter({
-      //   name: "x-csrf-token",
-      //   value: this._csrfToken
-      // }));
-
-      // MessageToast.show("点击确定按钮上传文件'" + oEvent.getParameter("newValue") + "'");
-
+      this.setModel(new JSONModel(oFileTableData), "MyFile");
+      oFileUploader.setValue("");
     },
     _get_csrf: function (entrySet) {
       var url = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ":" + window.location.port : "") +
         "/sap/opu/odata/sap/ZSY_HR_DZDA_SRV/" + entrySet;
       this._url = url;
       var that = this;
-      var _csrfToken = "";
       jQuery.ajax({
         url: url,
         async: false,
@@ -569,49 +545,11 @@ sap.ui.define([
         }
       });
     },
-    changeFileName: function () {
-      this.oUploadFileType = '01';
-      var NewFileName,
-        UploadTypeDesc,
-        oDate = new Date(),
-        counter, //conuter for file in one type
-        DateTime = oDate.getFullYear().toString() + oDate.getMonth().toString() + oDate.getDate().toString();
-
-      var oFileDrop = this.createFileTable(); //文件
-      for (var i = 0; i < oFileDrop.length; i++) {
-        if (oFileDrop[i].FileType == this.oUploadFileType) {
-          UploadTypeDesc = oFileDrop[i].FileDesc;
-          break;
-        }
-      }
-
-      switch (this.oUploadFileType) {
-        case '01':
-          counter = this.FileType01Max;
-          break;
-        case '02':
-          counter = this.FileType02Max;
-          break;
-        case '03':
-          counter = this.FileType03Max;
-          break;
-        case '04':
-          counter = this.FileType04Max;
-          break;
-        case '05':
-          counter = this.FileType05Max;
-          break;
-        case '06':
-          counter = this.FileType06Max;
-          break;
-      }
-      if (counter == '00') {
-        NewFileName = '10000015' + '_' + UploadTypeDesc + '_' + DateTime;
-      } else {
-        NewFileName = '10000015' + '_' + UploadTypeDesc + '_' + DateTime + '_' + counter;
-      }
-      counter++;
-      return NewFileName;
-    },
+    onDeleteFile: function (oEvent) {
+      var index = oEvent.getParameter("listItem").getBindingContextPath().replace("/", ""); //获取删除第几个文件
+      var oData = this.getModel("MyFile").getData();
+      oData.splice(index, 1);
+      this.setModel(new JSONModel(oData), "MyFile")
+    }
   });
 });

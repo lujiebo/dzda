@@ -63,9 +63,9 @@
 												editable="{onSearch>/oEditable}"  placeholder="电子档案类别"/>
                                 </fb:control>
                             </fb:FilterItem>
-                            <fb:FilterItem name="dateStart" label="{i18n>dateStart}" class="datepos">
+                            <fb:FilterItem name="dateStart" label="{i18n>dateStart}" class="datepos" >
                                 <fb:control>
-                                    <DatePicker id="datePickerfrom"  valueFormat="yyyyMMddHH" displayFormat="long"></DatePicker>
+                                    <DatePicker id="datePickerfrom"  valueFormat="yyyy-MM-dd" displayFormat="long"></DatePicker>
                                 </fb:control>
                             </fb:FilterItem>
                             <fb:FilterItem name="dateEnd" label="{i18n>dateEnd}" class="datepos">
@@ -116,19 +116,19 @@
                     <u:Column>
                         <Label text="{i18n>IndexView.Name}" />
                         <u:template>
-                            <Text text="{oDzda>ZhrDamc}"></Text>
+                            <Text text="{oDzda>Zhrdamc}"></Text>
                         </u:template>
                     </u:Column>
                     <u:Column>
                         <Label text="{i18n>TitleDZDAMK}" />
                         <u:template>
-                            <Text text="{oDzda>ZhrMkDesc}"></Text>
+                            <Text text="{oDzda>Zhrmkdesc}"></Text>
                         </u:template>
                     </u:Column>
                     <u:Column>
                         <Label text="{i18n>TitleDZDALB}" />
                         <u:template>
-                            <Text text="{oDzda>ZhrDzdalbDesc}"></Text>
+                            <Text text="{oDzda>Zhrdzdalt}"></Text>
                         </u:template>
                     </u:Column>
                 </u:columns>

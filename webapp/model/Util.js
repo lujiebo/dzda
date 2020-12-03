@@ -31,8 +31,11 @@ sap.ui.define([], function () {
 				return ele;
 			}
 		},
-		cutFrontZero:function (sValue) {
-			return sValue.replace(/\b(0+)/gi,"");
+		cutFrontZero: function (sValue) {
+			return sValue.replace(/\b(0+)/gi, "");
+		},
+		PrefixInteger: function (num, n) {
+			return (Array(n).join(0) + num).slice(-n);
 		}
 	};
 });

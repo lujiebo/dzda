@@ -4,30 +4,26 @@
 		growing="true" growingScrollToLoad="true" updateFinished=".onUpdateFinished" selectionChange="selectionChange" mode="Delete"
 		delete="onDeleteFile" items="{ path: 'MyFile>/' }">
 		<columns>
-			<Column id="FILENAME"  width="200px" demandPopin="true">
+			<Column id="FILENAME"  width="350px" demandPopin="true">
 				<Text text="文件名"/>
 			</Column>
-			<Column id="FILETYPE" width="100px" demandPopin="true">
-				<Text text="文件种类"/>
-			</Column>			
-			<Column id="MIMETYPE"  width="100px" demandPopin="true">
+			<Column id="MIMETYPE"  width="200px" demandPopin="true">
 				<Text text="文件类型"/>
 			</Column>
-			<Column id="SYDATE" width="100px" demandPopin="true">
+			<Column id="SYDATE" width="190px" demandPopin="true">
 				<Text text="上传日期"/>
 			</Column>
-			<Column id="SYTIME" width="100px"  demandPopin="true">
+			<Column id="SYTIME" width="190px"  demandPopin="true">
 				<Text text="上传时间"/>
 			</Column>
 		</columns>
 		<items>
 			<ColumnListItem press="onDisplayItem2" id="cliFile" type="Active">
 				<cells>
-					<Text text="{MyFile>FILENAME}"/>
-					<Text text="{MyFile>PRE_FILETYPE}"/>
-					<Text text="{MyFile>MIMETYPE}"/>
-					<Text text="{MyFile>SYDATE}"/>
-					<Text text="{MyFile>SYTIME}"/>
+					<Text text="{MyFile>FilenameOld}"/>
+					<Text text="{MyFile>Mimetype}"/>
+					<Text text="{MyFile>Sydate}"/>
+					<Text text="{MyFile>Sytime}"/>
 				</cells>
 			</ColumnListItem>
 		</items>
