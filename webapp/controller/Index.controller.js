@@ -28,18 +28,8 @@ sap.ui.define([
   return BaseController.extend("com.shunyu.dzda.controller.Index", {
     _tagfilterbar: null,
 
-    onclear: function onclear() {
-      alert("11")
-    },
     // 初始化
     onInit: function () {
-      this.FileType01Max = '00';
-      this.FileType02Max = '00';
-      this.FileType03Max = '00';
-      this.FileType04Max = '00';
-      this.FileType05Max = '00';
-      this.FileType06Max = '00';
-
       this.oDataModelPreEntry = this.getOwnerComponent().getModel("ZSY_HR_DZDA_SRV");
       this.oDataModelZCommon = this.getOwnerComponent().getModel("ZCommon");
       this._ResourceBundle = this.getModel("i18n").getResourceBundle();
@@ -63,6 +53,14 @@ sap.ui.define([
     ShowMessage: function (oMessage) {
       if (oMessage != "") {
         MessageBox.error(oMessage, {
+          styleClass: "sapUiSizeCompact"
+        });
+        return;
+      }
+    },
+    ShowSuccess: function (oMessage) {
+      if (oMessage != "") {
+        MessageBox.success(oMessage, {
           styleClass: "sapUiSizeCompact"
         });
         return;
@@ -123,6 +121,15 @@ sap.ui.define([
       ));
       aFilterGroupsFilters.push(new sap.ui.model.Filter(WerkFilters, true));
 
+      // 员工工号
+      if (Util.isNotNull(searchdata.PERNR)) {
+        PernrFilters.push(new sap.ui.model.Filter(
+          "Pernr",
+          sap.ui.model.FilterOperator.EQ,
+          searchdata.PERNR
+        ));
+        aFilterGroupsFilters.push(new sap.ui.model.Filter(PernrFilters, true));
+      }
       //人事子范围
       if (Util.isNotNull(searchdata.BTRTL)) {
         BtrtlFilters.push(new sap.ui.model.Filter(
@@ -222,7 +229,7 @@ sap.ui.define([
       var onSearchData = this.getView().getModel("onSearch").oData;
       switch (fcode) {
         case "PERNR":
-          var EZf4id = "PERNR_PRE";
+          var EZf4id = "PERNR";
           oModelName = "onSearch";
           oFilters.push(new Filter("F4ID", sap.ui.model.FilterOperator.EQ, EZf4id));
           this._JSONModel.setProperty("/appProperties/f4title", this._ResourceBundle.getText("TitlePrePernr"));
@@ -347,15 +354,19 @@ sap.ui.define([
     onUploadComplete: function (oEvent) {},
     onDialogImageOk: function (params) {
       var oFileTableData = this.getModel("MyFile");
-      var fileType = this.getModel("onSearch").getData().DZDALBUP;
+      var fileType = this.getModel("onSearch").getData().DZDALBUP; //上传的电子档案模块
       var fileTypeT = this.getModel("onSearch").getData().DZDALBTUP; //所选的电子档案类别文本
+      var pernrUp = this.byId("PernrUp").getValue(); //上传的工号
+      var DZDAMKUP = this.byId("DZDAMKUP").getValue(); //上传的电子档案模块
+      var DZDALBUP = this.byId("DZDALBUP").getValue(); //上传的电子档案类别
       var oEntity = {
         Pernr: "",
+        Zdzdamk: DZDAMKUP,
+        Zdzdalb: DZDALBUP,
+        Type: "",
+        Message: "",
         ZSY_FILE_ISet: []
       }
-      var pernrUp = this.byId("PernrUp").getValue(); //上传的工号
-      // var DzdaMkUP = this.byId("DzdaMkUP").getValue(); //上传的电子档案模块
-      var DZDALBUP = this.byId("DZDALBUP").getValue(); //上传的电子档案类别
       if (!Util.isNotNull(DZDALBUP)) {
         MessageToast.show("请选择电子档案类别!");
         return;
@@ -409,10 +420,12 @@ sap.ui.define([
       this.oDataModelPreEntry.create(sPath, oEntity, { //
         success: function (oData, oResponse) {
           // that.oBusyDialog.close();
-          if (oData.Type == 'E') {
-            that.ShowMessage(oData.Message);
+          if (oData.Type == 'S') {
+            this.ShowSuccess("上传成功!");
+            this.UploadDialog.close();
+            this.onSearch();
           } else {
-            // that.oInitCheckDialog.close();
+            that.ShowMessage("上传失败!");
           }
         }.bind(this),
         error: function (oError) {
@@ -432,6 +445,7 @@ sap.ui.define([
         sSupportedFileTypes);
     },
     handleValueChange: function (oEvent) {
+
       var oFileTableModel = this.getModel("MyFile"),
         oFileTableData;
       if (oFileTableModel != undefined) {
@@ -442,7 +456,6 @@ sap.ui.define([
       var oFileUploader = this.byId("fileUploader");
       var oDomRef = oFileUploader.getFocusDomRef();
       var files = oDomRef.files;
-      // var file0 = oDomRef.files[0];
       if (!oFileUploader.getValue()) {
         // MessageToast.show("请先上传文件");
         return;
@@ -545,11 +558,80 @@ sap.ui.define([
         }
       });
     },
+    onDownload: function () {
+      var oTable = this.byId("table");
+      var oSelectedIndexs = oTable.getSelectedIndices();
+      var index = oSelectedIndexs[0];
+      var oList = this.getModel("oDzda").getData().dzdalist;
+      var guids = ""
+      for (let i = 0; i < oSelectedIndexs.length; i++) {
+        var index = oSelectedIndexs[i];
+        var guid = oList[index].Zhrdacfdz;
+        guids += guid + ",";
+      }
+      guids = guids.substring(0, guids.length - 1);
+      window.open("/sap/opu/odata/sap/ZSY_HR_DZDA_SRV/ZSY_HR_FILESet(Guid='" + guids + "')/$value");
+    },
+    onView2: function (file) {
+      var reader = new FileReader();
+      var that = this;
+      reader.onload = function (e) {
+        var raw = e.target.result;
+        var hexString = that.convertBinaryToHex(raw).toUpperCase();
+        // DO YOUR THING HERE            
+      };
+
+      reader.onerror = function () {
+        sap.m.MessageToast.show("Error occured when uploading file");
+      };
+
+      reader.readAsDataURL(file);
+    },
+    convertBinaryToHex: function (buffer) {
+      return Array.prototype.map.call(new Uint8Array(buffer), function (x) {
+        return ("00" + x.toString(16)).slice(-2);
+      }).join("");
+    },
+    onDownload2: function () { //下载文档
+      var oEntity = {
+        Pernr: "",
+        Type: "",
+        Message: ""
+      }
+      var ZSY_FIXZ_ISet = new Array();
+      var oTable = this.byId("table");
+      var oList = this.getModel("oDzda").getData().dzdalist;
+      var oSelectedIndexs = oTable.getSelectedIndices();
+      for (let i = 0; i < oSelectedIndexs.length; i++) {
+        var index = oSelectedIndexs[i];
+        var fixzi = {
+          Pernr: oList[index].Pernr,
+          Guid: oList[index].Zhrdacfdz
+        }
+        ZSY_FIXZ_ISet.push(fixzi);
+      }
+      oEntity.ZSY_FIXZ_ISet = ZSY_FIXZ_ISet;
+
+      var sPath = "/ZSY_FIXZ_HSet";
+      this.oDataModelPreEntry.create(sPath, oEntity, { //
+        success: function (oData, oResponse) {
+          if (oData.Type == 'S') {
+            this.ShowSuccess("下载成功!");
+          } else {
+            this.ShowMessage("下载失败!");
+          }
+        }.bind(this),
+        error: function (oError) {}
+      });
+    },
     onDeleteFile: function (oEvent) {
       var index = oEvent.getParameter("listItem").getBindingContextPath().replace("/", ""); //获取删除第几个文件
       var oData = this.getModel("MyFile").getData();
       oData.splice(index, 1);
       this.setModel(new JSONModel(oData), "MyFile")
+    },
+    onClear2:function (oEvent) {
+      var t = oEvent.getSource();
     }
   });
 });

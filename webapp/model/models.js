@@ -52,7 +52,7 @@ sap.ui.define([
 				},
 				onSearchData:{
 					PERNR:"",
-					WERKS:"",
+					WERKS:"1005",
 					BTRTL:"",
 					PERSG:"",
 					PERSK:"",

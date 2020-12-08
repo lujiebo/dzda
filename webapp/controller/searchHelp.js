@@ -113,11 +113,23 @@ sap.ui.define([
 			var onSearchData = this._oParentView.getModel(oModelName).oData;
 			var oTableData = this._oParentView.getModel(oModelName).oData;
 			switch (fcode) {
-				case "PERNR_PRE":
+				case "PERNR":
 					onSearchData.PERNR = item.KEY1;
 					this._oParentView.setModel(new JSONModel(onSearchData), oModelName);
 					break;
+				// case "PERNR":
+				// 	this.oMultiPERNR.addToken(
+				// 		new Token({
+				// 			text: item.KEY1,
+				// 			key: item.KEY1
+				// 		})
+				// 	);
+				// 	break;
 				case "WERKS":
+					if(onSearchData.WERKS != item.KEY1) //说明选择的人事范围值发生了变化
+					{
+						onSearchData.BTRTL = "";
+					}
 					onSearchData.WERKS = item.KEY1;
 					this._oParentView.setModel(new JSONModel(onSearchData), oModelName);
 					break;
