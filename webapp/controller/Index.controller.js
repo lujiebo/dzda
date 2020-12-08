@@ -50,6 +50,22 @@ sap.ui.define([
 
       this._get_csrf('ZSY_HR_FILESet');
     },
+    ShowWarning: function (oMessage) {
+      if (oMessage != "") {
+        MessageBox.warning(oMessage, {
+          styleClass: "sapUiSizeCompact"
+        });
+        return;
+      }
+    },
+    ShowInfo: function (oMessage) {
+      if (oMessage != "") {
+        MessageBox.information(oMessage, {
+          styleClass: "sapUiSizeCompact"
+        });
+        return;
+      }
+    },
     ShowMessage: function (oMessage) {
       if (oMessage != "") {
         MessageBox.error(oMessage, {
@@ -377,7 +393,7 @@ sap.ui.define([
         var aFile = this.getModel("MyFile").getData();
         for (let i = 0; i < aFile.length; i++) {
           const file = aFile[i];
-          if (file.ISICON == '') { //说明有工号不存在
+          if (file.Isvalid == '') { //说明有工号不存在
             MessageToast.show(file.FilenameOld + "的工号在主系统中不存在,请检查文档命名后再进行上传!");
             break;
           }
@@ -481,7 +497,8 @@ sap.ui.define([
               Syuname: "",
               Value: "",
               Url: "",
-              IsIcon: ""
+              IsIcon: "",
+              Isvalid:""
             };
 
             var that = this;
@@ -492,7 +509,7 @@ sap.ui.define([
               oFileRow.Mimetype = oReFile.Mimetype;
               oFileRow.Syuname = oReFile.Syuname;
               oFileRow.Value = oReFile.Value;
-              oFileRow.IsIcon = oReFile.IsIcon; //用来判断该上传的文件名的工号在主系统中是否存在 X表示存在
+              oFileRow.Isvalid = oReFile.Isvalid; //用来判断该上传的文件名的工号在主系统中是否存在 X表示存在
               oFileTableData.push(oFileRow)
             };
             var _handleError = function (data) {
@@ -559,79 +576,113 @@ sap.ui.define([
       });
     },
     onDownload: function () {
+      // var oTable = this.byId("table");
+      // var oSelectedIndexs = oTable.getSelectedIndices();
+      // var oList = this.getModel("oDzda").getData().dzdalist;
+      // var guids = ""
+      // for (let i = 0; i < oSelectedIndexs.length; i++) {
+      //   var index = oSelectedIndexs[i];
+      //   var guid = oList[index].Zhrdacfdz;
+      //   guids += guid + ",";
+      // }
+      // guids = guids.substring(0, guids.length - 1);
+      // window.open("/sap/opu/odata/sap/ZSY_HR_DZDA_SRV/ZSY_HR_FILESet(Guid='" + guids + "')/$value");
       var oTable = this.byId("table");
       var oSelectedIndexs = oTable.getSelectedIndices();
-      var index = oSelectedIndexs[0];
       var oList = this.getModel("oDzda").getData().dzdalist;
-      var guids = ""
+      var selArray = new Array();
+      for (let i = 0; i < oSelectedIndexs.length; i++) {
+        var index = oSelectedIndexs[i];
+        var selItem = oList[index];
+        selArray.push(selItem);
+      }
+      const sorted = Util.groupBy(selArray, function (item) { //获取按工号分组的数据
+        return [item.Pernr];
+      });
+      // console.log(sorted);
+      for (let i = 0; i < sorted.length; i++) {
+        var perGroup = sorted[i]; //获取到每一分组
+        var guids = ""
+        for (let j = 0; j < perGroup.length; j++) {
+          var element = perGroup[j]; //获取到组的一条记录
+          var guid = element.Zhrdacfdz;
+          guids += guid + ",";
+        }
+        guids = guids.substring(0, guids.length - 1);
+        window.open("/sap/opu/odata/sap/ZSY_HR_DZDA_SRV/ZSY_HR_FILESet(Guid='" + guids + "',,Type='2')/$value");
+      }
+    },
+    onView: function () {
+      var oTable = this.byId("table");
+      var oSelectedIndexs = oTable.getSelectedIndices();
+      if (oSelectedIndexs.length == 0) {
+        this.ShowWarning(this._ResourceBundle.getText("oSelectValid"));
+        return;
+      }
+      var oList = this.getModel("oDzda").getData().dzdalist;
       for (let i = 0; i < oSelectedIndexs.length; i++) {
         var index = oSelectedIndexs[i];
         var guid = oList[index].Zhrdacfdz;
-        guids += guid + ",";
+        window.open("/sap/opu/odata/sap/ZSY_HR_DZDA_SRV/ZSY_HR_FILESet(Guid='" + guid + "',Type='1')/$value");
       }
-      guids = guids.substring(0, guids.length - 1);
-      window.open("/sap/opu/odata/sap/ZSY_HR_DZDA_SRV/ZSY_HR_FILESet(Guid='" + guids + "')/$value");
     },
-    onView2: function (file) {
-      var reader = new FileReader();
-      var that = this;
-      reader.onload = function (e) {
-        var raw = e.target.result;
-        var hexString = that.convertBinaryToHex(raw).toUpperCase();
-        // DO YOUR THING HERE            
-      };
+    // onView2: function (file) {
+    //   var reader = new FileReader();
+    //   var that = this;
+    //   reader.onload = function (e) {
+    //     var raw = e.target.result;
+    //     var hexString = that.convertBinaryToHex(raw).toUpperCase();
+    //     // DO YOUR THING HERE            
+    //   };
 
-      reader.onerror = function () {
-        sap.m.MessageToast.show("Error occured when uploading file");
-      };
+    //   reader.onerror = function () {
+    //     sap.m.MessageToast.show("Error occured when uploading file");
+    //   };
 
-      reader.readAsDataURL(file);
-    },
-    convertBinaryToHex: function (buffer) {
-      return Array.prototype.map.call(new Uint8Array(buffer), function (x) {
-        return ("00" + x.toString(16)).slice(-2);
-      }).join("");
-    },
-    onDownload2: function () { //下载文档
-      var oEntity = {
-        Pernr: "",
-        Type: "",
-        Message: ""
-      }
-      var ZSY_FIXZ_ISet = new Array();
-      var oTable = this.byId("table");
-      var oList = this.getModel("oDzda").getData().dzdalist;
-      var oSelectedIndexs = oTable.getSelectedIndices();
-      for (let i = 0; i < oSelectedIndexs.length; i++) {
-        var index = oSelectedIndexs[i];
-        var fixzi = {
-          Pernr: oList[index].Pernr,
-          Guid: oList[index].Zhrdacfdz
-        }
-        ZSY_FIXZ_ISet.push(fixzi);
-      }
-      oEntity.ZSY_FIXZ_ISet = ZSY_FIXZ_ISet;
+    //   reader.readAsDataURL(file);
+    // },
+    // convertBinaryToHex: function (buffer) {
+    //   return Array.prototype.map.call(new Uint8Array(buffer), function (x) {
+    //     return ("00" + x.toString(16)).slice(-2);
+    //   }).join("");
+    // },
+    // onDownload2: function () { //下载文档
+    //   var oEntity = {
+    //     Pernr: "",
+    //     Type: "",
+    //     Message: ""
+    //   }
+    //   var ZSY_FIXZ_ISet = new Array();
+    //   var oTable = this.byId("table");
+    //   var oList = this.getModel("oDzda").getData().dzdalist;
+    //   var oSelectedIndexs = oTable.getSelectedIndices();
+    //   for (let i = 0; i < oSelectedIndexs.length; i++) {
+    //     var index = oSelectedIndexs[i];
+    //     var fixzi = {
+    //       Pernr: oList[index].Pernr,
+    //       Guid: oList[index].Zhrdacfdz
+    //     }
+    //     ZSY_FIXZ_ISet.push(fixzi);
+    //   }
+    //   oEntity.ZSY_FIXZ_ISet = ZSY_FIXZ_ISet;
 
-      var sPath = "/ZSY_FIXZ_HSet";
-      this.oDataModelPreEntry.create(sPath, oEntity, { //
-        success: function (oData, oResponse) {
-          if (oData.Type == 'S') {
-            this.ShowSuccess("下载成功!");
-          } else {
-            this.ShowMessage("下载失败!");
-          }
-        }.bind(this),
-        error: function (oError) {}
-      });
-    },
+    //   var sPath = "/ZSY_FIXZ_HSet";
+    //   this.oDataModelPreEntry.create(sPath, oEntity, { //
+    //     success: function (oData, oResponse) {
+    //       if (oData.Type == 'S') {
+    //         this.ShowSuccess("下载成功!");
+    //       } else {
+    //         this.ShowMessage("下载失败!");
+    //       }
+    //     }.bind(this),
+    //     error: function (oError) {}
+    //   });
+    // },
     onDeleteFile: function (oEvent) {
       var index = oEvent.getParameter("listItem").getBindingContextPath().replace("/", ""); //获取删除第几个文件
       var oData = this.getModel("MyFile").getData();
       oData.splice(index, 1);
       this.setModel(new JSONModel(oData), "MyFile")
-    },
-    onClear2:function (oEvent) {
-      var t = oEvent.getSource();
     }
   });
 });

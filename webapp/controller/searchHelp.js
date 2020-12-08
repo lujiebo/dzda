@@ -138,6 +138,10 @@ sap.ui.define([
 					this._oParentView.setModel(new JSONModel(onSearchData), oModelName);
 					break;
 				case "PERSG":
+					if(onSearchData.PERSG != item.KEY1) //说明选择的员工组值发生了变化
+					{
+						onSearchData.PERSK = "";
+					}
 					onSearchData.PERSG = item.KEY1;
 					this._oParentView.setModel(new JSONModel(onSearchData), oModelName);
 					break;
@@ -146,6 +150,10 @@ sap.ui.define([
 					this._oParentView.setModel(new JSONModel(onSearchData), oModelName);
 					break;
 				case "DZDAMK":
+					if(onSearchData.DZDAMK != item.KEY1) //说明选择的模块值发生了变化
+					{
+						onSearchData.DZDALB = "";
+					}
 					onSearchData.DZDAMK = item.KEY1;
 					this._oParentView.setModel(new JSONModel(onSearchData), oModelName);
 					break;
@@ -154,6 +162,10 @@ sap.ui.define([
 					this._oParentView.setModel(new JSONModel(onSearchData), oModelName);
 					break;
 				case "DZDAMKUP":
+					if(onSearchData.DZDAMKUP != item.KEY1) //说明选择的模块值发生了变化
+					{
+						onSearchData.DZDALBUP = "";
+					}
 					onSearchData.DZDAMKUP = item.KEY1;
 					this._oParentView.setModel(new JSONModel(onSearchData), oModelName);
 					break;

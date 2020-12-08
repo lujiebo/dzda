@@ -100,19 +100,19 @@
                 </OverflowToolbar>
             </u:extension>
             <u:columns>
-                <u:Column>
+                <u:Column width="5rem">
                     <Label text="{i18n>IndexView.Seq}"/>
                     <u:template>
-                        <Text text="{oDzda>Seq}"></Text>
+                        <Text text="{oDzda>Seq}" width="5rem"></Text>
                     </u:template>
                 </u:Column>
-                <u:Column>
+                <u:Column width="10rem">
                     <Label text="{i18n>TitlePrePernr}" />
                     <u:template>
                         <Text text="{oDzda>Pernr}"></Text>
                     </u:template>
                 </u:Column>
-                <u:Column>
+                <u:Column width="30rem">
                     <Label text="{i18n>IndexView.Name}" />
                     <u:template>
                         <Text text="{oDzda>Zhrdamc}"></Text>
@@ -134,4 +134,5 @@
         </u:Table>
     </f:content>
 </f:DynamicPage>
-<!-- <core:Fragment fragmentName="com/shunyu/dzda/view/FileUpload" type="XML"></core:Fragment> -->undefinedundefinedundefined</mvc:View>
+<!-- <core:Fragment fragmentName="com/shunyu/dzda/view/FileUpload" type="XML"></core:Fragment> -->
+</mvc:View>
