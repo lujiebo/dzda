@@ -30,6 +30,14 @@ sap.ui.define([
 
     // 初始化
     onInit: function () {
+      var oPageModel = new JSONModel({
+        currentPage: 1,
+        totalPage: 1,
+        pageCount: 100,
+        totalCount: ""
+      });
+      this.setModel(oPageModel, "oPageModel");
+
       this.oDataModelPreEntry = this.getOwnerComponent().getModel("ZSY_HR_DZDA_SRV");
       this.oDataModelZCommon = this.getOwnerComponent().getModel("ZCommon");
       this._ResourceBundle = this.getModel("i18n").getResourceBundle();
@@ -47,6 +55,18 @@ sap.ui.define([
       }
       var oSearchModel = new JSONModel(gyzt);
       this.setModel(oSearchModel, "searchModel");
+
+      var isDel = {
+        list: [{
+          "key": "true",
+          "value": "是"
+        }, {
+          "key": "false",
+          "value": "否"
+        }, ]
+      }
+      var oDelModel = new JSONModel(isDel);
+      this.setModel(oDelModel, "delModel");
 
       this._get_csrf('ZSY_HR_FILESet');
     },
@@ -91,7 +111,6 @@ sap.ui.define([
         );
         this.getView().addDependent(this.UploadDialog);
       }
-
       this.UploadDialog.open();
       // if (!this._oValueHelpDialog) {
       //   Fragment.load({
@@ -106,6 +125,7 @@ sap.ui.define([
       // }
     },
     onDialogImageCancel: function () {
+      this.clearUpload();
       this.UploadDialog.close();
     },
     // 执行按钮
@@ -120,7 +140,8 @@ sap.ui.define([
         DzdamkFilters = [], //电子档案模块
         DzdalbFilters = [], //电子档案类别
         BegdaFilters = [], //开始日期
-        EnddaFilters = []; //结束日期
+        EnddaFilters = [], //结束日期
+        IsdelFilters = []; //是否删除
 
       if (!Util.isNotNull(searchdata.WERKS)) {
         MessageToast.show("请选择人事范围!", {
@@ -199,7 +220,7 @@ sap.ui.define([
       //进入集团日期
       if (Util.isNotNull(this.byId("datePickerfrom").getValue())) {
         BegdaFilters.push(new sap.ui.model.Filter(
-          "Ryend", //pa0000中的开始日期
+          "Rybeg", //pa0000中的开始日期
           sap.ui.model.FilterOperator.GE,
           this.byId("datePickerfrom").getValue()
         ));
@@ -208,11 +229,22 @@ sap.ui.define([
       //离开集团日期
       if (Util.isNotNull(this.byId("datePickerTo").getValue())) {
         EnddaFilters.push(new sap.ui.model.Filter(
-          "Rybeg", //pa0000中的结束日期
+          "Ryend", //pa0000中的结束日期
           sap.ui.model.FilterOperator.LE,
           this.byId("datePickerTo").getValue()
         ));
         aFilterGroupsFilters.push(new sap.ui.model.Filter(EnddaFilters, true));
+      }
+
+      var sIsdel = this.byId("isdel").getSelectedKey();
+      //是否删除
+      if (Util.isNotNull(sIsdel)) {
+        IsdelFilters.push(new sap.ui.model.Filter(
+          "Isdel",
+          sap.ui.model.FilterOperator.EQ,
+          sIsdel
+        ));
+        aFilterGroupsFilters.push(new sap.ui.model.Filter(IsdelFilters, true));
       }
 
 
@@ -235,7 +267,7 @@ sap.ui.define([
       });
     },
     ValueHelp: function (oEvent) {
-      // this.openBusyDialog();
+      this.openBusyDialog();
       var that = this;
       var fcode = this.getfcode(oEvent),
         sPath = "/ZSY_HR_SH_COMMSet",
@@ -264,7 +296,7 @@ sap.ui.define([
           oFilters.push(new Filter("F4ID", sap.ui.model.FilterOperator.EQ, EZf4id));
           if (onSearchData.WERKS == "") {
             this.ShowMessage(this._ResourceBundle.getText("oCheckErrorF4WerksIsNull"));
-            //this.oBusyDialog.close();
+            this.oBusyDialog.close();
             return;
           }
           oFilters.push(new Filter("FILTER1", sap.ui.model.FilterOperator.EQ, onSearchData.WERKS));
@@ -284,7 +316,7 @@ sap.ui.define([
           oFilters.push(new Filter("F4ID", sap.ui.model.FilterOperator.EQ, EZf4id));
           if (onSearchData.PERSG == "") {
             this.ShowMessage(this._ResourceBundle.getText("oCheckErrorF4PerskIsNull"));
-            //this.oBusyDialog.close();
+            this.oBusyDialog.close();
             return;
           }
           oFilters.push(new Filter("FILTER1", sap.ui.model.FilterOperator.EQ, onSearchData.PERSG));
@@ -304,7 +336,7 @@ sap.ui.define([
           oFilters.push(new Filter("F4ID", sap.ui.model.FilterOperator.EQ, EZf4id));
           if (onSearchData.DZDAMK == "") {
             this.ShowMessage(this._ResourceBundle.getText("oCheckErrorF4DzdamkIsNull"));
-            //this.oBusyDialog.close();
+            this.oBusyDialog.close();
             return;
           }
           oFilters.push(new Filter("FILTER1", sap.ui.model.FilterOperator.EQ, onSearchData.DZDAMK));
@@ -324,7 +356,7 @@ sap.ui.define([
           oFilters.push(new Filter("F4ID", sap.ui.model.FilterOperator.EQ, EZf4id));
           if (onSearchData.DZDAMKUP == "") {
             this.ShowMessage(this._ResourceBundle.getText("oCheckErrorF4DzdamkIsNull"));
-            //this.oBusyDialog.close();
+            this.oBusyDialog.close();
             return;
           }
           oFilters.push(new Filter("FILTER1", sap.ui.model.FilterOperator.EQ, onSearchData.DZDAMKUP));
@@ -341,10 +373,9 @@ sap.ui.define([
           var oJson = oData.results;
           that.getView().getModel().setProperty("/searchHelp/f4h2r", oJson);
           // oModel.setSizeLimit(9999);
-          // that.getView().getModel().getProperty("/searchHelp")
-          // that.oBusyDialog.close();
+          that.oBusyDialog.close();
           that.openDialog(oEvent);
-          that.getView().setBusy(false);
+          // that.getView().setBusy(false);
         },
         error: function (error) {
           // that.oBusyDialog.close();
@@ -387,6 +418,15 @@ sap.ui.define([
         MessageToast.show("请选择电子档案类别!");
         return;
       }
+      if (!Util.isNotNull(oFileTableData)) {
+        MessageToast.show("请先上传文件!");
+        return;
+      }
+      if (!Util.isNotNull(oFileTableData.getData())) {
+        MessageToast.show("请先上传文件!");
+        return;
+      }
+      var flag = true; //判断是否通过验证
       if (Util.isNotNull(pernrUp)) {
         oEntity.Pernr = pernrUp;
       } else { //工号为空则校验文件名称和类型是否符合
@@ -394,7 +434,8 @@ sap.ui.define([
         for (let i = 0; i < aFile.length; i++) {
           const file = aFile[i];
           if (file.Isvalid == '') { //说明有工号不存在
-            MessageToast.show(file.FilenameOld + "的工号在主系统中不存在,请检查文档命名后再进行上传!");
+            MessageToast.show(file.FilenameOld + "格式不正确,工号在主系统中不存在!");
+            flag = false;
             break;
           }
           if (file.FilenameOld) {
@@ -402,46 +443,55 @@ sap.ui.define([
             if (aNamelist.length > 0) {
               if (fileTypeT != aNamelist[1]) {
                 MessageToast.show(file.FilenameOld + "格式不正确,请检查文档命名后再进行上传!");
+                flag = false;
                 break;
               }
             } else {
               MessageToast.show(file.FilenameOld + "格式不正确,请检查文档命名后再进行上传!");
+              flag = false;
               break;
             }
           } else {
             MessageToast.show(file.FilenameOld + "格式不正确,请检查文档命名后再进行上传!");
+            flag = false;
             break;
           }
         }
       }
 
+      if (!flag) {
+        return;
+      }
       var sPath = "/ZSY_FILE_HSet";
       oEntity.ZSY_FILE_ISet = oFileTableData.getData();
       for (let i = 0; i < oEntity.ZSY_FILE_ISet.length; i++) {
         const element = oEntity.ZSY_FILE_ISet[i];
         element.Filetype = fileType;
+        var sFixIndex = element.FilenameOld.lastIndexOf("\.");
+        //截取最后一个/后的值
+        var filefix = element.FilenameOld.substring(sFixIndex, element.FilenameOld.length);
         if (Util.isNotNull(oEntity.Pernr)) { //选择工号自动生成模板信息
           var pernr8 = Util.PrefixInteger(oEntity.Pernr, 8); //工号补零
-
-          var sIndex = element.FilenameOld.lastIndexOf("\.");
-          //截取最后一个/后的值
-          var filefix = element.FilenameOld.substring(sIndex, element.FilenameOld.length);
           element.Filename = pernr8 + '_' + fileTypeT + '_' + element.Sydate + filefix;
-        } else { //不然就取上传文件名
+        } else { //不然就取上i
           var sIndex = element.FilenameOld.indexOf("_");
-          var pernr8 = Util.PrefixInteger(element.FilenameOld.substring(0, sIndex), 8);;
-          element.Filename = pernr8 + element.FilenameOld.substring(sIndex, element.FilenameOld.length);
+          var sSecIndex = element.FilenameOld.indexOf('_', sIndex + 1); //获取到第二个_的index
+          var pernr8 = Util.PrefixInteger(element.FilenameOld.substring(0, sIndex), 8);
+          var dzdalb = element.FilenameOld.substring(sIndex + 1, sSecIndex);
+          element.Filename = pernr8 + '_' + dzdalb + '_' + element.Sydate + filefix;
         }
       }
+
       this.oDataModelPreEntry.create(sPath, oEntity, { //
         success: function (oData, oResponse) {
-          // that.oBusyDialog.close();
+          // this.oBusyDialog.close();
           if (oData.Type == 'S') {
-            this.ShowSuccess("上传成功!");
+            // this.ShowSuccess("上传成功!");
             this.UploadDialog.close();
+            this.clearUpload();
             this.onSearch();
           } else {
-            that.ShowMessage("上传失败!");
+            this.ShowMessage(oData.Message);
           }
         }.bind(this),
         error: function (oError) {
@@ -476,6 +526,7 @@ sap.ui.define([
         // MessageToast.show("请先上传文件");
         return;
       }
+      this.openBusyDialog();
       this._get_csrf('ZSY_HR_FILESet');
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
@@ -498,11 +549,12 @@ sap.ui.define([
               Value: "",
               Url: "",
               IsIcon: "",
-              Isvalid:""
+              Isvalid: ""
             };
 
             var that = this;
             var _handleSuccess = function (data, xhr, settings) {
+              that.oBusyDialog.close();
               var oReFile = data.d; //odata返回的文件流
               oFileRow.Sydate = oReFile.Sydate;
               oFileRow.Sytime = oReFile.Sytime;
@@ -513,7 +565,8 @@ sap.ui.define([
               oFileTableData.push(oFileRow)
             };
             var _handleError = function (data) {
-              debugger;
+              that.oBusyDialog.close();
+              // debugger;
               var errorMsg = '';
               if (data.responseText[1]) {
                 errorMsg = /<message>(.*?)<\/message>/.exec(data.responseText)[1];
@@ -529,7 +582,7 @@ sap.ui.define([
             var oHeaders = {
               "x-csrf-token": this._csrfToken,
               "slug": encodeURIComponent(file.name),
-              "pernr": filePernr
+              "pernr": encodeURIComponent(filePernr)
             };
             jQuery.ajax({
               type: 'POST',
@@ -576,19 +629,16 @@ sap.ui.define([
       });
     },
     onDownload: function () {
-      // var oTable = this.byId("table");
-      // var oSelectedIndexs = oTable.getSelectedIndices();
-      // var oList = this.getModel("oDzda").getData().dzdalist;
-      // var guids = ""
-      // for (let i = 0; i < oSelectedIndexs.length; i++) {
-      //   var index = oSelectedIndexs[i];
-      //   var guid = oList[index].Zhrdacfdz;
-      //   guids += guid + ",";
-      // }
-      // guids = guids.substring(0, guids.length - 1);
-      // window.open("/sap/opu/odata/sap/ZSY_HR_DZDA_SRV/ZSY_HR_FILESet(Guid='" + guids + "')/$value");
       var oTable = this.byId("table");
       var oSelectedIndexs = oTable.getSelectedIndices();
+      if (oSelectedIndexs.length == 0) {
+        this.ShowWarning(this._ResourceBundle.getText("oSelectValid"));
+        return;
+      }
+      if(!this.checkIsDel()){  //说明有删除的
+        this.ShowWarning(this._ResourceBundle.getText("oSelDel"));
+        return;
+      }
       var oList = this.getModel("oDzda").getData().dzdalist;
       var selArray = new Array();
       for (let i = 0; i < oSelectedIndexs.length; i++) {
@@ -605,11 +655,11 @@ sap.ui.define([
         var guids = ""
         for (let j = 0; j < perGroup.length; j++) {
           var element = perGroup[j]; //获取到组的一条记录
-          var guid = element.Zhrdacfdz;
+          var guid = element.Compid;
           guids += guid + ",";
         }
         guids = guids.substring(0, guids.length - 1);
-        window.open("/sap/opu/odata/sap/ZSY_HR_DZDA_SRV/ZSY_HR_FILESet(Guid='" + guids + "',,Type='2')/$value");
+        window.open("/sap/opu/odata/sap/ZSY_HR_DZDA_SRV/ZSY_HR_FILESet(Guid='" + guids + "')/$value");
       }
     },
     onView: function () {
@@ -619,12 +669,65 @@ sap.ui.define([
         this.ShowWarning(this._ResourceBundle.getText("oSelectValid"));
         return;
       }
+      if(!this.checkIsDel()){  //说明有删除的
+        this.ShowWarning(this._ResourceBundle.getText("oSelDel"));
+        return;
+      }
       var oList = this.getModel("oDzda").getData().dzdalist;
       for (let i = 0; i < oSelectedIndexs.length; i++) {
         var index = oSelectedIndexs[i];
-        var guid = oList[index].Zhrdacfdz;
-        window.open("/sap/opu/odata/sap/ZSY_HR_DZDA_SRV/ZSY_HR_FILESet(Guid='" + guid + "',Type='1')/$value");
+        //之前没有直接预览的地址
+        // var guid = oList[index].Compid;  
+        // window.open("/sap/opu/odata/sap/ZSY_HR_DZDA_SRV/ZSY_HR_FILESet(Guid='" + guid + "',Type='1')/$value");
+        //直接用生成的地址
+        var url = oList[index].Zhrdacfdz;
+        window.open('/' + url);
       }
+    },
+    onDelete: function () {
+      var oTable = this.byId("table");
+      var oSelectedIndexs = oTable.getSelectedIndices();
+      if (oSelectedIndexs.length == 0) {
+        this.ShowWarning(this._ResourceBundle.getText("oSelectValid"));
+        return;
+      }
+      if(!this.checkIsDel()){  //说明有删除的
+        this.ShowWarning(this._ResourceBundle.getText("oSelDel"));
+        return;
+      }
+      var oEntity = {
+        Pernr: "",
+        Type: "",
+        Message: ""
+      }
+      var ZSY_FIXZ_ISet = new Array();
+      var oTable = this.byId("table");
+      var oList = this.getModel("oDzda").getData().dzdalist;
+      var oSelectedIndexs = oTable.getSelectedIndices();
+      for (let i = 0; i < oSelectedIndexs.length; i++) {
+        var index = oSelectedIndexs[i];
+        var fixzi = {
+          Pernr: oList[index].Pernr,
+          Guid: oList[index].Compid
+        }
+        ZSY_FIXZ_ISet.push(fixzi);
+      }
+      oEntity.ZSY_FIXZ_ISet = ZSY_FIXZ_ISet;
+      oEntity.Pernr = oList[0].Pernr;
+
+      var sPath = "/ZSY_FIXZ_HSet";
+      this.oDataModelPreEntry.create(sPath, oEntity, { //
+        success: function (oData, oResponse) {
+          if (oData.Type == 'S') {
+            this.ShowSuccess("删除成功!");
+            this.onSearch();
+          } else {
+            this.ShowMessage(oData.Message);
+          }
+        }.bind(this),
+        error: function (oError) {}
+      });
+
     },
     // onView2: function (file) {
     //   var reader = new FileReader();
@@ -646,43 +749,34 @@ sap.ui.define([
     //     return ("00" + x.toString(16)).slice(-2);
     //   }).join("");
     // },
-    // onDownload2: function () { //下载文档
-    //   var oEntity = {
-    //     Pernr: "",
-    //     Type: "",
-    //     Message: ""
-    //   }
-    //   var ZSY_FIXZ_ISet = new Array();
-    //   var oTable = this.byId("table");
-    //   var oList = this.getModel("oDzda").getData().dzdalist;
-    //   var oSelectedIndexs = oTable.getSelectedIndices();
-    //   for (let i = 0; i < oSelectedIndexs.length; i++) {
-    //     var index = oSelectedIndexs[i];
-    //     var fixzi = {
-    //       Pernr: oList[index].Pernr,
-    //       Guid: oList[index].Zhrdacfdz
-    //     }
-    //     ZSY_FIXZ_ISet.push(fixzi);
-    //   }
-    //   oEntity.ZSY_FIXZ_ISet = ZSY_FIXZ_ISet;
-
-    //   var sPath = "/ZSY_FIXZ_HSet";
-    //   this.oDataModelPreEntry.create(sPath, oEntity, { //
-    //     success: function (oData, oResponse) {
-    //       if (oData.Type == 'S') {
-    //         this.ShowSuccess("下载成功!");
-    //       } else {
-    //         this.ShowMessage("下载失败!");
-    //       }
-    //     }.bind(this),
-    //     error: function (oError) {}
-    //   });
-    // },
     onDeleteFile: function (oEvent) {
       var index = oEvent.getParameter("listItem").getBindingContextPath().replace("/", ""); //获取删除第几个文件
       var oData = this.getModel("MyFile").getData();
       oData.splice(index, 1);
       this.setModel(new JSONModel(oData), "MyFile")
+    },
+    clearUpload: function () {
+      if (Util.isNotNull(this.getModel("MyFile"))) {
+        this.getModel("MyFile").setData(new Array());
+      }
+      this.byId("PernrUp").setValue("");
+      this.byId("DZDAMKUP").setValue("");
+      this.byId("DZDALBUP").setValue("");
+    },
+    checkIsDel: function () {
+      var oTable = this.byId("table");
+      var oList = this.getModel("oDzda").getData().dzdalist;
+      var oSelectedIndexs = oTable.getSelectedIndices();
+      var flag = true;
+      for (let i = 0; i < oSelectedIndexs.length; i++) {
+        var index = oSelectedIndexs[i];
+        var item = oList[index];
+        if(item.Isdel == true){
+          flag = false;
+          break;
+        }
+      }
+      return flag;
     }
   });
 });

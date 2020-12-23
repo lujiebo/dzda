@@ -3,6 +3,8 @@
     xmlns:core="sap.ui.core"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns:f="sap.f"
+    xmlns:l="sap.ui.layout"
+    xmlns:commons="sap.ui.commons"
     xmlns:form="sap.ui.layout.form"
     xmlns:u="sap.ui.table"
     xmlns:fb="sap.ui.comp.filterbar" controllerName="com.shunyu.dzda.controller.Index" height="100%">
@@ -10,129 +12,161 @@
         <!--查询条件-->
         <f:title>
             <f:DynamicPageTitle>
-                <f:heading><Title text="{i18n>IndexView.search}"/></f:heading>
+                <f:heading>
+                    <Title text="{i18n>IndexView.search}"/>
+                </f:heading>
             </f:DynamicPageTitle>
         </f:title>
         <!--各查询条件输入选择框-->
         <f:header>
             <f:DynamicPageHeader>
                 <f:content>
-                <fb:FilterBar search="onSearch" useToolbar="false"
+                    <fb:FilterBar search="onSearch" useToolbar="false"
 							showGoOnFB="true" showFilterConfiguration="false" id="tagfilter">
-                    <fb:filterItems>
-                        <fb:FilterItem name="pernr" label="{i18n>TitlePrePernr}">
-                            <fb:control>
-                                <!-- <Input id="PERNR" value="{onSearch>/PERNR}"
+                        <fb:filterItems>
+                            <fb:FilterItem name="pernr" label="{i18n>TitlePrePernr}">
+                                <fb:control>
+                                    <!-- <Input id="PERNR" value="{onSearch>/PERNR}"
 							            editable="{onSearch>/oEditable}" placeholder="人员工号" maxLength="8"/> -->
-                                <Input id="PERNR" value="{onSearch>/PERNR}"  showValueHelp="true" valueHelpRequest="ValueHelp" editable="{onSearch>/oEditable}" placeholder="人员号" />
-                            </fb:control>
-                        </fb:FilterItem>
-                        <fb:FilterItem name="werks"  label="{i18n>TitleWERKS}">
-                            <fb:control>
-                                <Input id="WERKS" value="{onSearch>/WERKS}" submit="WerksSubmit" showValueHelp="true" valueHelpRequest="ValueHelp"
-												editable="{yonSearch>/oEditable}"  placeholder="人事范围" required="true" change="onClear2"/>
-                            </fb:control>
-                        </fb:FilterItem>
-                        <fb:FilterItem name="btrtl"  label="{i18n>TitleBTRTL}">
-                            <fb:control>
-                                <Input id="BTRTL" value="{onSearch>/BTRTL}" submit="BtrtlSubmit" showValueHelp="true" valueHelpRequest="ValueHelp"
+                                    <Input id="PERNR" value="{onSearch>/PERNR}"  showValueHelp="true" valueHelpRequest="ValueHelp" editable="{onSearch>/oEditable}" placeholder="人员号" />
+                                </fb:control>
+                            </fb:FilterItem>
+                            <fb:FilterItem name="werks"  label="{i18n>TitleWERKS}">
+                                <fb:control>
+                                    <Input id="WERKS" value="{onSearch>/WERKS}"  showValueHelp="true" valueHelpRequest="ValueHelp"
+												editable="{onSearch>/oEditable}"  placeholder="人事范围" required="true" change="onClear2"/>
+                                </fb:control>
+                            </fb:FilterItem>
+                            <fb:FilterItem name="btrtl"  label="{i18n>TitleBTRTL}">
+                                <fb:control>
+                                    <Input id="BTRTL" value="{onSearch>/BTRTL}"  showValueHelp="true" valueHelpRequest="ValueHelp"
 												editable="{onSearch>/oEditable}"  placeholder="人事子范围"/>
-                            </fb:control>
-                        </fb:FilterItem>
-                        <fb:FilterItem name="persg" label="{i18n>TitlePERSG}" >
-                            <fb:control>
-                                <Input id="PERSG" value="{onSearch>/PERSG}" submit="PersgSubmit" showValueHelp="true" valueHelpRequest="ValueHelp"
+                                </fb:control>
+                            </fb:FilterItem>
+                            <fb:FilterItem name="persg" label="{i18n>TitlePERSG}" >
+                                <fb:control>
+                                    <Input id="PERSG" value="{onSearch>/PERSG}"  showValueHelp="true" valueHelpRequest="ValueHelp"
 												editable="{onSearch>/oEditable}"  placeholder="员工组"/>
-                            </fb:control>
-                        </fb:FilterItem>
-                        <fb:FilterItem name="persk" label="{i18n>TitlePERSK}">
-                            <fb:control>
-                                <Input id="PERSK" value="{onSearch>/PERSK}" submit="PerskSubmit" showValueHelp="true" valueHelpRequest="ValueHelp"
+                                </fb:control>
+                            </fb:FilterItem>
+                            <fb:FilterItem name="persk" label="{i18n>TitlePERSK}">
+                                <fb:control>
+                                    <Input id="PERSK" value="{onSearch>/PERSK}"  showValueHelp="true" valueHelpRequest="ValueHelp"
 												editable="{onSearch>/oEditable}"  placeholder="员工子组"/>
-                            </fb:control>
-                        </fb:FilterItem>
-                        <fb:FilterItem name="dzdamk" label="{i18n>TitleDZDAMK}">
-                            <fb:control>
-                                <Input id="DZDAMK" value="{onSearch>/DZDAMK}" submit="DzdamkKSubmit" showValueHelp="true" valueHelpRequest="ValueHelp"
+                                </fb:control>
+                            </fb:FilterItem>
+                            <fb:FilterItem name="dzdamk" label="{i18n>TitleDZDAMK}">
+                                <fb:control>
+                                    <Input id="DZDAMK" value="{onSearch>/DZDAMK}" submit="DzdamkKSubmit" showValueHelp="true" valueHelpRequest="ValueHelp"
 												editable="{onSearch>/oEditable}"  placeholder="电子档案模块"/>
-                            </fb:control>
-                        </fb:FilterItem>
-                        <fb:FilterItem name="dzdalb" label="{i18n>TitleDZDALB}">
-                            <fb:control>
-                                <Input id="DZDALB" value="{onSearch>/DZDALB}" submit="DzdalbKSubmit" showValueHelp="true" valueHelpRequest="ValueHelp"
+                                </fb:control>
+                            </fb:FilterItem>
+                            <fb:FilterItem name="dzdalb" label="{i18n>TitleDZDALB}">
+                                <fb:control>
+                                    <Input id="DZDALB" value="{onSearch>/DZDALB}" submit="DzdalbKSubmit" showValueHelp="true" valueHelpRequest="ValueHelp"
 												editable="{onSearch>/oEditable}"  placeholder="电子档案类别"/>
-                            </fb:control>
-                        </fb:FilterItem>
-                        <fb:FilterItem name="dateStart" label="{i18n>dateStart}" class="datepos" >
-                            <fb:control>
-                                <DatePicker id="datePickerfrom"  valueFormat="yyyy-MM-dd" displayFormat="long"></DatePicker>
-                            </fb:control>
-                        </fb:FilterItem>
-                        <fb:FilterItem name="dateEnd" label="{i18n>dateEnd}" class="datepos">
-                            <fb:control>
-                                <DatePicker id="datePickerTo"  valueFormat="yyyy-MM-dd" displayFormat="long">
-                                    <layoutData></layoutData>
-                                </DatePicker>
-                            </fb:control>
-                        </fb:FilterItem>
-                        <!-- <fb:FilterItem name="gyzt" label="{i18n>IndexView.GyStatus}"><fb:control><ComboBox id="s_gyzt" showSecondaryValues="true" 
+                                </fb:control>
+                            </fb:FilterItem>
+                            <fb:FilterItem name="dateStart" label="{i18n>dateStart}" class="datepos" >
+                                <fb:control>
+                                    <DatePicker id="datePickerfrom"  valueFormat="yyyy-MM-dd" displayFormat="long"></DatePicker>
+                                </fb:control>
+                            </fb:FilterItem>
+                            <fb:FilterItem name="dateEnd" label="{i18n>dateEnd}" class="datepos">
+                                <fb:control>
+                                    <DatePicker id="datePickerTo"  valueFormat="yyyy-MM-dd" displayFormat="long">
+                                        <layoutData></layoutData>
+                                    </DatePicker>
+                                </fb:control>
+                            </fb:FilterItem>
+                            <!-- <fb:FilterItem name="gyzt" label="{i18n>IndexView.GyStatus}"><fb:control><ComboBox id="s_gyzt" showSecondaryValues="true" 
 											selectedKey="3"
 											items="{ path: 'searchModel>/list', templateShareable:false }"><core:ListItem key="{searchModel>key}" text="{searchModel>value}" /></ComboBox></fb:control></fb:FilterItem> -->
-                    </fb:filterItems>
-                </fb:FilterBar>
-            </f:content>
-        </f:DynamicPageHeader>
-    </f:header>
-    <f:content>
-        <u:Table id="table" selectionMode="MultiToggle" visibleRowCount="10" rowActionCount="1" 
-                        rows="{path: 'oDzda>/dzdalist'}" ariaLabelledBy="title" class="sapUiSmallMarginBeginEnd"
+                            <fb:FilterItem name="isdel" label="{i18n>IndexView.isDel}">
+                                <fb:control>
+                                    <ComboBox id="isdel" showSecondaryValues="true"
+											selectedKey="false"
+											items="{ path: 'delModel>/list', templateShareable:false }">
+                                        <core:ListItem key="{delModel>key}" text="{delModel>value}"/>
+                                    </ComboBox>
+                                </fb:control>
+                            </fb:FilterItem>
+                        </fb:filterItems>
+                    </fb:FilterBar>
+                </f:content>
+            </f:DynamicPageHeader>
+        </f:header>
+        <f:content>
+            <u:Table id="table" selectionMode="MultiToggle" visibleRowCountMode="Auto" rowActionCount="1" 
+                        rows="{path: 'oDzda>/dzdalist'}"  class="sapUiSmallMarginBeginEnd"
 						>
-            <u:extension>
-                <OverflowToolbar>
-                    <content>
-                        <Title text="{i18n>IndexView.tableTitle}" level="H2"/>
-                        <ToolbarSpacer/>
-                        <Button id="oUpload" type="Emphasized" text="上传" press="onUpload"/>
-                        <Button id="onDownload" type="Emphasized" text="下载" press="onDownload"/>
-                        <Button id="oDelete" type="Emphasized" text="删除" press="onDelete"/>
-                        <Button id="onView" type="Emphasized" text="概览" press="onView"/>
-                    </content>
-                </OverflowToolbar>
-            </u:extension>
-            <u:columns>
-                <u:Column width="5rem">
-                    <Label text="{i18n>IndexView.Seq}"/>
-                    <u:template>
-                        <Text text="{oDzda>Seq}" width="5rem"></Text>
-                    </u:template>
-                </u:Column>
-                <u:Column width="10rem">
-                    <Label text="{i18n>TitlePrePernr}" />
-                    <u:template>
-                        <Text text="{oDzda>Pernr}"></Text>
-                    </u:template>
-                </u:Column>
-                <u:Column width="30rem">
-                    <Label text="{i18n>IndexView.Name}" />
-                    <u:template>
-                        <Text text="{oDzda>Zhrdamc}"></Text>
-                    </u:template>
-                </u:Column>
-                <u:Column>
-                    <Label text="{i18n>TitleDZDAMK}" />
-                    <u:template>
-                        <Text text="{oDzda>Zhrmkdesc}"></Text>
-                    </u:template>
-                </u:Column>
-                <u:Column>
-                    <Label text="{i18n>TitleDZDALB}" />
-                    <u:template>
-                        <Text text="{oDzda>Zhrdzdalt}"></Text>
-                    </u:template>
-                </u:Column>
-            </u:columns>
-        </u:Table>
-    </f:content>
-</f:DynamicPage>
-<!-- <core:Fragment fragmentName="com/shunyu/dzda/view/FileUpload" type="XML"></core:Fragment> -->
+                <u:extension>
+                    <OverflowToolbar>
+                        <content>
+                            <Title text="{i18n>IndexView.tableTitle}" level="H2"/>
+                            <ToolbarSpacer/>
+                            <Button id="oUpload" type="Emphasized" text="上传" press="onUpload"/>
+                            <Button id="onView" type="Emphasized" text="概览" press="onView"/>
+                            <Button id="onDownload" type="Emphasized" text="下载" press="onDownload"/>
+                            <Button id="oDelete" type="Emphasized" text="删除" press="onDelete"/>
+                        </content>
+                    </OverflowToolbar>
+                </u:extension>
+                <u:columns>
+                    <u:Column width="5rem">
+                        <Label text="{i18n>IndexView.Seq}"/>
+                        <u:template>
+                            <Text text="{oDzda>Seq}" width="5rem"></Text>
+                            <!-- <Label text="{oDzda>Seq}"><layoutData><l:GridData span="XL2 L2 M4 S8"/></layoutData></Label> -->
+                        </u:template>
+                    </u:Column>
+                    <u:Column width="10rem">
+                        <Label text="{i18n>TitlePrePernr}" />
+                        <u:template>
+                            <Text text="{oDzda>Pernr}"></Text>
+                        </u:template>
+                    </u:Column>
+                    <u:Column width="30rem">
+                        <Label text="{i18n>IndexView.Name}" />
+                        <u:template>
+                            <Text text="{oDzda>Zhrdamc}"></Text>
+                        </u:template>
+                    </u:Column>
+                    <u:Column width="10rem">
+                        <Label text="{i18n>TitleDZDAMK}" />
+                        <u:template>
+                            <Text text="{oDzda>Zhrmkdesc}"></Text>
+                        </u:template>
+                    </u:Column>
+                    <u:Column width="10rem">
+                        <Label text="{i18n>TitleDZDALB}" />
+                        <u:template>
+                            <Text text="{oDzda>Zhrdzdalt}"></Text>
+                        </u:template>
+                    </u:Column>
+                    <u:Column width="10rem">
+                        <Label text="{i18n>TitleBegda}" />
+                        <u:template>
+                            <Text text="{path:'oDzda>Begda', type:'sap.ui.model.type.DateTime', 
+                 formatOptions: {UTC:true, pattern: 'yyyy-MM-dd', strictParsing: true} }"/>
+                        </u:template>
+                    </u:Column>
+                    <u:Column width="10rem">
+                        <Label text="{i18n>TitleEndda}" />
+                        <u:template>
+                            <Text text="{path:'oDzda>Endda', type:'sap.ui.model.type.DateTime', 
+                 formatOptions: {UTC:true, pattern: 'yyyy-MM-dd', strictParsing: true} }"/>
+                        </u:template>
+                    </u:Column>
+                    <u:Column width="10rem">
+                        <Label text="{i18n>IndexView.IsDel}" />
+                        <u:template>
+                            <Text text="{=${oDzda>Isdel}?'是':'否'}"></Text>
+                        </u:template>
+                    </u:Column>
+                </u:columns>
+            </u:Table>
+        </f:content>
+    </f:DynamicPage>
+    <core:Fragment fragmentName="com.shunyu.dzda.view.BusyDialog" type="XML"/>
 </mvc:View>

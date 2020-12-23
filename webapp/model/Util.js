@@ -38,7 +38,7 @@ sap.ui.define([], function () {
 			return (Array(n).join(0) + num).slice(-n);
 		},
 		groupBy(array, f) {
-			debugger;
+			// debugger;
 			const groups = {};
 			array.forEach(function (o) {
 				const group = JSON.stringify(f(o));
