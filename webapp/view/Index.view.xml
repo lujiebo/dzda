@@ -43,6 +43,12 @@
 												editable="{onSearch>/oEditable}"  placeholder="人事子范围"/>
                                 </fb:control>
                             </fb:FilterItem>
+                            <fb:FilterItem name="org"  label="{i18n>TitleORG}">
+                                <fb:control>
+                                    <Input id="ORG" value="{onSearch>/ORG}"  showValueHelp="true" valueHelpRequest="ValueHelp"
+												editable="{onSearch>/oEditable}"  placeholder="部门"/>
+                                </fb:control>
+                            </fb:FilterItem>
                             <fb:FilterItem name="persg" label="{i18n>TitlePERSG}" >
                                 <fb:control>
                                     <Input id="PERSG" value="{onSearch>/PERSG}"  showValueHelp="true" valueHelpRequest="ValueHelp"
@@ -57,14 +63,14 @@
                             </fb:FilterItem>
                             <fb:FilterItem name="dzdamk" label="{i18n>TitleDZDAMK}">
                                 <fb:control>
-                                    <Input id="DZDAMK" value="{onSearch>/DZDAMK}" submit="DzdamkKSubmit" showValueHelp="true" valueHelpRequest="ValueHelp"
+                                    <Input id="DZDAMK" value="{onSearch>/DZDAMK}"  showValueHelp="true" valueHelpRequest="ValueHelp"
 												editable="{onSearch>/oEditable}"  placeholder="电子档案模块"/>
                                 </fb:control>
                             </fb:FilterItem>
                             <fb:FilterItem name="dzdalb" label="{i18n>TitleDZDALB}">
                                 <fb:control>
-                                    <Input id="DZDALB" value="{onSearch>/DZDALB}" submit="DzdalbKSubmit" showValueHelp="true" valueHelpRequest="ValueHelp"
-												editable="{onSearch>/oEditable}"  placeholder="电子档案类别"/>
+                                    <Input id="DZDALB" value="{onSearch>/DZDALB}" showValueHelp="true" valueHelpRequest="ValueHelp"
+												editable="{onSearch>/oEditable}"  placeholder="电子档案类别" />
                                 </fb:control>
                             </fb:FilterItem>
                             <fb:FilterItem name="dateStart" label="{i18n>dateStart}" class="datepos" >
@@ -97,7 +103,7 @@
             </f:DynamicPageHeader>
         </f:header>
         <f:content>
-            <u:Table id="table" selectionMode="MultiToggle" visibleRowCountMode="Auto" rowActionCount="1" 
+            <u:Table id="table" selectionMode="MultiToggle" visibleRowCount="10" rowActionCount="1" 
                         rows="{path: 'oDzda>/dzdalist'}"  class="sapUiSmallMarginBeginEnd"
 						>
                 <u:extension>
@@ -109,6 +115,7 @@
                             <Button id="onView" type="Emphasized" text="概览" press="onView"/>
                             <Button id="onDownload" type="Emphasized" text="下载" press="onDownload"/>
                             <Button id="oDelete" type="Emphasized" text="删除" press="onDelete"/>
+                            <!-- <Button id="onRet" type="Emphasized" text="找回" press="onRet"/> -->
                         </content>
                     </OverflowToolbar>
                 </u:extension>

@@ -32,6 +32,8 @@ sap.ui.define([
 		},
 
 		onSearch: function (evt) {
+			var fcode = this._Controller._JSONModel.getProperty("/appProperties/fcode");
+			var onSearchData = this._oParentView.getModel("onSearch").oData;
 			var searchHelp = this._oViewModel.getProperty("/searchHelp"),
 				VALUE1,
 				KEY1;
@@ -47,6 +49,19 @@ sap.ui.define([
 			var oFilters = [];
 			var sUrl = "/ZSY_HR_SH_COMMSet";
 			var that = this;
+			switch (fcode) {
+				case "PERSK":
+					oFilters.push(new Filter("FILTER1", sap.ui.model.FilterOperator.EQ, onSearchData.PERSG));
+					break;
+				case "DZDALB":
+					oFilters.push(new Filter("FILTER1", sap.ui.model.FilterOperator.EQ, onSearchData.DZDAMK));
+					break;
+				default:
+					if (onSearchData.WERKS !== '') {
+						oFilters.push(new Filter("FILTER1", sap.ui.model.FilterOperator.EQ, onSearchData.WERKS));
+					}
+					break;
+			}
 			oFilters.push(new Filter("F4ID", sap.ui.model.FilterOperator.EQ, this._oViewModel.getProperty("/appProperties/fcode")));
 			if (searchHelp.KEY1 !== '') {
 				oFilters.push(new Filter("KEY1", sap.ui.model.FilterOperator.EQ, KEY1));
@@ -63,7 +78,7 @@ sap.ui.define([
 					that._oViewModel.setSizeLimit(that._oViewModel.getProperty("/searchHelp/EMaxrecords"));
 				},
 				error: function (error) {
-					that.getView().setBusy(false);
+					that._oParentView.setBusy(false);
 				}
 			});
 		},
@@ -112,21 +127,22 @@ sap.ui.define([
 			var oPath = this._oViewModel.getProperty("/searchHelp/Path");
 			var onSearchData = this._oParentView.getModel(oModelName).oData;
 			var oTableData = this._oParentView.getModel(oModelName).oData;
+			var oDzdaModel = this._oParentView.getModel("ZSY_HR_DZDA_SRV")
 			switch (fcode) {
 				case "PERNR":
 					onSearchData.PERNR = item.KEY1;
 					this._oParentView.setModel(new JSONModel(onSearchData), oModelName);
 					break;
-				// case "PERNR":
-				// 	this.oMultiPERNR.addToken(
-				// 		new Token({
-				// 			text: item.KEY1,
-				// 			key: item.KEY1
-				// 		})
-				// 	);
-				// 	break;
+					// case "PERNR":
+					// 	this.oMultiPERNR.addToken(
+					// 		new Token({
+					// 			text: item.KEY1,
+					// 			key: item.KEY1
+					// 		})
+					// 	);
+					// 	break;
 				case "WERKS":
-					if(onSearchData.WERKS != item.KEY1) //说明选择的人事范围值发生了变化
+					if (onSearchData.WERKS != item.KEY1) //说明选择的人事范围值发生了变化
 					{
 						onSearchData.BTRTL = "";
 					}
@@ -138,7 +154,7 @@ sap.ui.define([
 					this._oParentView.setModel(new JSONModel(onSearchData), oModelName);
 					break;
 				case "PERSG":
-					if(onSearchData.PERSG != item.KEY1) //说明选择的员工组值发生了变化
+					if (onSearchData.PERSG != item.KEY1) //说明选择的员工组值发生了变化
 					{
 						onSearchData.PERSK = "";
 					}
@@ -150,7 +166,7 @@ sap.ui.define([
 					this._oParentView.setModel(new JSONModel(onSearchData), oModelName);
 					break;
 				case "DZDAMK":
-					if(onSearchData.DZDAMK != item.KEY1) //说明选择的模块值发生了变化
+					if (onSearchData.DZDAMK != item.KEY1) //说明选择的模块值发生了变化
 					{
 						onSearchData.DZDALB = "";
 					}
@@ -162,7 +178,7 @@ sap.ui.define([
 					this._oParentView.setModel(new JSONModel(onSearchData), oModelName);
 					break;
 				case "DZDAMKUP":
-					if(onSearchData.DZDAMKUP != item.KEY1) //说明选择的模块值发生了变化
+					if (onSearchData.DZDAMKUP != item.KEY1) //说明选择的模块值发生了变化
 					{
 						onSearchData.DZDALBUP = "";
 					}
@@ -170,8 +186,41 @@ sap.ui.define([
 					this._oParentView.setModel(new JSONModel(onSearchData), oModelName);
 					break;
 				case "DZDALBUP":
+					if (onSearchData.DZDALBUP != item.KEY1) //说明选择的模块值发生了变化
+					{
+						var oFileUploader = this._oParentView.byId("fileUploader");
+						var oDomRef = oFileUploader.getFocusDomRef();
+						this._oParentView.setBusy(true);
+						var oFilters = [],
+							aFilterGroupsFilters = [];
+						oFilters.push(new sap.ui.model.Filter(
+							"Zlbid",
+							sap.ui.model.FilterOperator.EQ,
+							item.KEY1
+						));
+						aFilterGroupsFilters.push(new sap.ui.model.Filter(oFilters, true));
+						oDzdaModel.read("/ZSY_HR_DZDAPZSet", {
+							filters: aFilterGroupsFilters,
+							success: function (oData, oResponse) {
+								var oJson = oData.results;
+								if (oJson.length > 0) {
+									oDomRef.accept = oJson[0].Zfiletype; //设置打开的格式
+									this._oParentView._filetype = oJson[0].Zfiletype;
+								}
+								console.log(oJson)
+								this._oParentView.setBusy(false);
+							}.bind(this),
+							error: function (error) {
+								this._oParentView.setBusy(false);
+							}.bind(this)
+						});
+					}
 					onSearchData.DZDALBUP = item.KEY1;
 					onSearchData.DZDALBTUP = item.VALUE1;
+					this._oParentView.setModel(new JSONModel(onSearchData), oModelName);
+					break;
+				case "ORG":
+					onSearchData.ORG = item.KEY1;
 					this._oParentView.setModel(new JSONModel(onSearchData), oModelName);
 					break;
 			}
