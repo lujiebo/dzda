@@ -18,8 +18,9 @@
             <f:content>
                 <Label text="电子档案类别" />
                 <Input id="DZDALBUP" value="{onSearch>/DZDALBUP}" submit="DzdamkKSubmit" showValueHelp="true" valueHelpRequest="ValueHelp"
-												editable="{onSearch>/oEditable}"  placeholder="电子档案模块" change="onChangeType"/>
+												editable="{onSearch>/oEditable}"  placeholder="电子档案模块"/>
             </f:content>
+
             <f:content>
                 <Label text="电子档案上传" />
                 <u:FileUploader id="fileUploader" name="myFileUpload" 
@@ -29,6 +30,7 @@
 			        uploadComplete="onUploadComplete" change="handleValueChange" 
                     typeMissmatch="handleTypeMissmatch" uploadStart="handleBeforeUpload"
 			        sendXHR="true" style="Emphasized" placeholder="单击此处或浏览按钮上传文件" buttonOnly="false" buttonText="选择文件"
+                     class="fileuploader"
                     >
                     <u:parameters>
                         <u:FileUploaderParameter name="param1" value="Foo"/>
@@ -39,6 +41,10 @@
                         <u:FileUploaderParameter name="headerParam2" value="bar"/>
                     </u:headerParameters>
                 </u:FileUploader>
+            </f:content>
+            <f:content>
+                <Label text="" />
+                <Text text="{filetypes>/content}" class="filetext"></Text>
             </f:content>
         </f:SimpleForm>
         <core:Fragment fragmentName="com/shunyu/dzda/view/FileView" type="XML"></core:Fragment>

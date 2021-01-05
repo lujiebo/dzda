@@ -27,6 +27,20 @@ sap.ui.define([
 
   return BaseController.extend("com.shunyu.dzda.controller.Index", {
     _tagfilterbar: null,
+    formatTime: function (time) {
+      var hh = time.substring(0, 2);
+      var mm = time.substring(2, 4);
+      var ss = time.substring(4, 6);
+      var timeStr = hh + ':' + mm + ':' + ss;
+      return timeStr;
+    },
+    formatDay: function (day) {
+      var yyyy = day.substring(0, 4);
+      var mm = day.substring(4, 6);
+      var dd = day.substring(6, 8);
+      var dayStr = yyyy + '-' + mm + '-' + dd;
+      return dayStr;
+    },
     // onAfterRendering: function (oEvent) {
     //   var oInputWerks = this.byId("WERKS");
     //   jQuery.sap.delayedCall(0, this, function () {
@@ -98,6 +112,7 @@ sap.ui.define([
           $('#' + oID).attr("disabled", "disabled");
         }
       }, oDatePicker1);
+
     },
     ShowWarning: function (oMessage) {
       if (oMessage != "") {
@@ -154,6 +169,24 @@ sap.ui.define([
         oDomRef.accept = '*.*';
       }
 
+      var oDzmk = this.getView().byId("DZDAMKUP");
+      oDzmk.addEventDelegate({
+        onAfterRendering: function () {
+          var oDzmkInner = this.$().find('.sapMInputBaseInner');
+          var oID = oDzmkInner[0].id;
+          $('#' + oID).attr("disabled", "disabled");
+        }
+      }, oDzmk);
+
+      var oDzlbup = this.getView().byId("DZDALBUP");
+      oDzlbup.addEventDelegate({
+        onAfterRendering: function () {
+          var oDzlbupInner = this.$().find('.sapMInputBaseInner');
+          var oID = oDzlbupInner[0].id;
+          $('#' + oID).attr("disabled", "disabled");
+        }
+      }, oDzlbup);
+
       // if (!this._oValueHelpDialog) {
       //   Fragment.load({
       //     name: "com.shunyu.dzda.view.FileUpload",
@@ -169,6 +202,9 @@ sap.ui.define([
     onDialogImageCancel: function () {
       this.clearUpload();
       this.UploadDialog.close();
+      this.setModel(new JSONModel({
+        "content": ""
+      }), "filetypes");
     },
     // 执行按钮
     onSearch: function (oEvent) {
@@ -779,7 +815,8 @@ sap.ui.define([
       var oEntity = {
         Pernr: "",
         Type: "",
-        Message: ""
+        Message: "",
+        Action: "1" //表示删除
       }
       var ZSY_FIXZ_ISet = new Array();
       var oTable = this.byId("table");
@@ -809,6 +846,51 @@ sap.ui.define([
         error: function (oError) {}
       });
 
+    },
+    onRet:function () {
+      var oTable = this.byId("table");
+      var oSelectedIndexs = oTable.getSelectedIndices();
+      if (oSelectedIndexs.length == 0) {
+        this.ShowWarning(this._ResourceBundle.getText("oSelectValid"));
+        return;
+      }
+      if (!this.checkIsNotDel()) { //说明有删除的
+        this.ShowWarning(this._ResourceBundle.getText("oSelNotDel"));
+        return;
+      }
+      var oEntity = {
+        Pernr: "",
+        Type: "",
+        Message: "",
+        Action: "2" //表示找回
+      }
+      var ZSY_FIXZ_ISet = new Array();
+      var oTable = this.byId("table");
+      var oList = this.getModel("oDzda").getData().dzdalist;
+      var oSelectedIndexs = oTable.getSelectedIndices();
+      for (let i = 0; i < oSelectedIndexs.length; i++) {
+        var index = oSelectedIndexs[i];
+        var fixzi = {
+          Pernr: oList[index].Pernr,
+          Guid: oList[index].Compid
+        }
+        ZSY_FIXZ_ISet.push(fixzi);
+      }
+      oEntity.ZSY_FIXZ_ISet = ZSY_FIXZ_ISet;
+      oEntity.Pernr = oList[0].Pernr;
+
+      var sPath = "/ZSY_FIXZ_HSet";
+      this.oDataModelPreEntry.create(sPath, oEntity, { //
+        success: function (oData, oResponse) {
+          if (oData.Type == 'S') {
+            this.ShowSuccess("找回成功!");
+            this.onSearch();
+          } else {
+            this.ShowMessage(oData.Message);
+          }
+        }.bind(this),
+        error: function (oError) {}
+      });
     },
     // onView2: function (file) {
     //   var reader = new FileReader();
@@ -862,8 +944,20 @@ sap.ui.define([
       }
       return flag;
     },
-    onChangeType: function () {
-      this.byId("fileUploader")
+    checkIsNotDel: function () {
+      var oTable = this.byId("table");
+      var oList = this.getModel("oDzda").getData().dzdalist;
+      var oSelectedIndexs = oTable.getSelectedIndices();
+      var flag = true;
+      for (let i = 0; i < oSelectedIndexs.length; i++) {
+        var index = oSelectedIndexs[i];
+        var item = oList[index];
+        if (item.Isdel == false) {
+          flag = false;
+          break;
+        }
+      }
+      return flag;
     }
   });
 });

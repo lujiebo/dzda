@@ -6,6 +6,10 @@
 /*	border-left: 1px solid lightgray;*/
 /*}*/
 
+.filetext{
+    color:crimson
+}
+
 .formheader .sapUiFormTitle.sapUiFormTitleH4 {
   height: 0rem;
   padding-bottom: 0rem;
