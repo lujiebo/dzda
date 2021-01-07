@@ -147,6 +147,7 @@ sap.ui.define([
 						onSearchData.BTRTL = "";
 					}
 					onSearchData.WERKS = item.KEY1;
+					onSearchData.WERKST = item.VALUE1;
 					this._oParentView.setModel(new JSONModel(onSearchData), oModelName);
 					break;
 				case "BTRTL":
@@ -181,7 +182,9 @@ sap.ui.define([
 					if (onSearchData.DZDAMKUP != item.KEY1) //说明选择的模块值发生了变化
 					{
 						onSearchData.DZDALBUP = "";
-						this._oParentView.setModel(new JSONModel({"content":""}),"filetypes");
+						this._oParentView.setModel(new JSONModel({
+							"content": ""
+						}), "filetypes");
 					}
 					onSearchData.DZDAMKUP = item.KEY1;
 					this._oParentView.setModel(new JSONModel(onSearchData), oModelName);
@@ -207,12 +210,15 @@ sap.ui.define([
 								if (oJson.length > 0) {
 									oDomRef.accept = oJson[0].Zfiletype; //设置打开的格式
 									this._oParentView._filetype = oJson[0].Zfiletype;
-									this._oParentView.setModel(new JSONModel({"content":"支持的文件格式 "+oJson[0].Zfiletype}),"filetypes");
-								}
-								else{
+									this._oParentView.setModel(new JSONModel({
+										"content": "支持的文件格式 " + oJson[0].Zfiletype
+									}), "filetypes");
+								} else {
 									oDomRef.accept = "*.*"; //未限制则默认都可以选
 									this._oParentView._filetype = "*.*";
-									this._oParentView.setModel(new JSONModel({"content":"支持的文件格式 *.*"}),"filetypes");
+									this._oParentView.setModel(new JSONModel({
+										"content": "支持的文件格式 *.*"
+									}), "filetypes");
 								}
 								// console.log(oJson)
 								this._oParentView.setBusy(false);

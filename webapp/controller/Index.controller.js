@@ -41,11 +41,12 @@ sap.ui.define([
       var dayStr = yyyy + '-' + mm + '-' + dd;
       return dayStr;
     },
-    // onAfterRendering: function (oEvent) {
-    //   var oInputWerks = this.byId("WERKS");
-    //   jQuery.sap.delayedCall(0, this, function () {
-    //     oInputWerks.focus();
-    //   });
+    onAfterRendering: function (oEvent) {
+      var goBtn = this.byId("__component0---Index--tagfilter-btnGo");
+      goBtn.setText("查询");
+      // var retBtn = this.byId("__component0---Index--tagfilter-btnClear");
+      // retBtn.setText("重置");
+    },
 
     //   // oInputWerks.onfocusout = function(){
     //   //   this.ShowMessage(this._ResourceBundle.getText("oCheckErrorF4WerksIsNull"));
@@ -112,6 +113,16 @@ sap.ui.define([
           $('#' + oID).attr("disabled", "disabled");
         }
       }, oDatePicker1);
+
+      var oTable = this.byId("table");
+
+      oTable.addEventDelegate({
+        onAfterRendering: function () {
+          oTable.getColumns().forEach((oColumn, index) => {
+            oTable.autoResizeColumn(index);
+          });
+        }.bind(this)
+      });
 
     },
     ShowWarning: function (oMessage) {
@@ -205,6 +216,11 @@ sap.ui.define([
       this.setModel(new JSONModel({
         "content": ""
       }), "filetypes");
+    },
+    onClear: function () {
+      this.getModel("onSearch").setData({});
+      this.byId("datePickerTo").setValue("");
+      this.byId("datePickerfrom").setValue("")
     },
     // 执行按钮
     onSearch: function (oEvent) {
@@ -603,7 +619,7 @@ sap.ui.define([
         success: function (oData, oResponse) {
           // this.oBusyDialog.close();
           if (oData.Type == 'S') {
-            // this.ShowSuccess("上传成功!");
+            this.ShowSuccess("上传成功!");
             this.UploadDialog.close();
             this.clearUpload();
             this.onSearch();
@@ -847,7 +863,7 @@ sap.ui.define([
       });
 
     },
-    onRet:function () {
+    onRet: function () {
       var oTable = this.byId("table");
       var oSelectedIndexs = oTable.getSelectedIndices();
       if (oSelectedIndexs.length == 0) {
@@ -917,9 +933,6 @@ sap.ui.define([
       var oData = this.getModel("MyFile").getData();
       oData.splice(index, 1);
       this.setModel(new JSONModel(oData), "MyFile")
-    },
-    onRet: function (oEvent) {
-
     },
     clearUpload: function () {
       if (Util.isNotNull(this.getModel("MyFile"))) {

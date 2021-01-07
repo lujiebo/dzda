@@ -7,7 +7,20 @@
 /*}*/
 
 .filetext{
-    color:crimson
+    color: #000000;
+    font-weight: bolder;
+}
+
+.sapUiRFLContainer{
+    vertical-align: middle;
+}
+
+.customFilter .sapMBtnTransparent {
+    background-image: none;
+    background-color: #5496cd;
+    border-color: #418ac7;
+    color: #ffffff;
+    text-shadow: 0 0 0.125rem rgba(0,0,0,0.5);
 }
 
 .formheader .sapUiFormTitle.sapUiFormTitleH4 {

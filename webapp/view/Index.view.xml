@@ -22,7 +22,7 @@
             <f:DynamicPageHeader>
                 <f:content>
                     <fb:FilterBar search="onSearch" useToolbar="false"
-							showGoOnFB="true" showFilterConfiguration="false" id="tagfilter">
+							showGoOnFB="true" showClearOnFB="true"  showFilterConfiguration="false" id="tagfilter" class="customFilter" clear="onClear">
                         <fb:filterItems>
                             <fb:FilterItem name="pernr" label="{i18n>TitlePrePernr}">
                                 <fb:control>
@@ -115,7 +115,7 @@
                             <Button id="onView" type="Emphasized" text="概览" press="onView"/>
                             <Button id="onDownload" type="Emphasized" text="下载" press="onDownload"/>
                             <Button id="oDelete" type="Emphasized" text="删除" press="onDelete"/>
-                            <!-- <Button id="onRet" type="Emphasized" text="找回" press="onRet"/> -->
+                            <Button id="onRet" type="Emphasized" text="找回" press="onRet"/>
                         </content>
                     </OverflowToolbar>
                 </u:extension>
@@ -131,6 +131,18 @@
                         <Label text="{i18n>TitlePrePernr}" />
                         <u:template>
                             <Text text="{oDzda>Pernr}"></Text>
+                        </u:template>
+                    </u:Column>
+                    <u:Column width="15rem">
+                        <Label text="{i18n>TitleGs}" />
+                        <u:template>
+                            <Text text="{oDzda>Zgsms}"></Text>
+                        </u:template>
+                    </u:Column>
+                    <u:Column width="15rem">
+                        <Label text="{i18n>TitleBm}" />
+                        <u:template>
+                            <Text text="{oDzda>Zbmms}"></Text>
                         </u:template>
                     </u:Column>
                     <u:Column width="30rem">
