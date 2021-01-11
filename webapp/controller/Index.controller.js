@@ -611,8 +611,12 @@ sap.ui.define([
         } else { //不然就取上i
           var sIndex = element.FilenameOld.indexOf("_");
           var sSecIndex = element.FilenameOld.indexOf('_', sIndex + 1); //获取到第二个_的index
+          if(sSecIndex == -1){ //防止没有第二个_
+                var dzdalb = element.FilenameOld.split("_")[1].split(".")[0];
+          }else{
+               var dzdalb = element.FilenameOld.substring(sIndex + 1, sSecIndex);
+          }
           var pernr8 = Util.PrefixInteger(element.FilenameOld.substring(0, sIndex), 8);
-          var dzdalb = element.FilenameOld.substring(sIndex + 1, sSecIndex);
           element.Filename = pernr8 + '_' + dzdalb + '_' + element.Sydate + filefix;
         }
       }
