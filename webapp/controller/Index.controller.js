@@ -42,8 +42,13 @@ sap.ui.define([
       return dayStr;
     },
     onAfterRendering: function (oEvent) {
-      var goBtn = this.byId("__component0---Index--tagfilter-btnGo");
+      // var clearBtn  = document.querySelectorAll('.customFilter .sapMBtn')[0].id;
+      var goBtnID = document.querySelectorAll('.customFilter .sapMBtn')[1].id;
+      var goBtn = this.byId(goBtnID);
       goBtn.setText("查询");
+      goBtn.setTooltip("查询");
+      // var goBtn = this.byId("application-ZSY_HR_DZDA-display-component---Index--tagfilter-btnGo"); 
+      // goBtn.setText("查询");
       // var retBtn = this.byId("__component0---Index--tagfilter-btnClear");
       // retBtn.setText("重置");
     },
@@ -565,7 +570,7 @@ sap.ui.define([
           if (file.FilenameOld) {
             var aNamelist = file.FilenameOld.split('_'); //拆分文件名称
             if (aNamelist.length > 0) {
-              if (fileTypeT != aNamelist[1]) {
+              if (fileTypeT != aNamelist[1].split(".")[0]) {
                 MessageToast.show(file.FilenameOld + "格式不正确,请检查文档命名后再进行上传!");
                 flag = false;
                 break;
@@ -594,9 +599,11 @@ sap.ui.define([
         var sFixIndex = element.FilenameOld.lastIndexOf("\.");
         //截取最后一个/后的值
         var filefix = element.FilenameOld.substring(sFixIndex, element.FilenameOld.length);
-        if (this.getView()._filetype.toLowerCase().indexOf(filefix.toLowerCase()) == -1) { //上传前校验格式
-          flag = false;
-          break;
+        if (!this.getView()._filetype.toLowerCase() == '*.*') {
+          if (this.getView()._filetype.toLowerCase().indexOf(filefix.toLowerCase()) == -1) { //上传前校验格式
+            flag = false;
+            break;
+          }
         }
         if (Util.isNotNull(oEntity.Pernr)) { //选择工号自动生成模板信息
           var pernr8 = Util.PrefixInteger(oEntity.Pernr, 8); //工号补零

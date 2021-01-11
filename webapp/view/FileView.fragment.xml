@@ -8,16 +8,16 @@
 		growing="true" growingScrollToLoad="true" updateFinished=".onUpdateFinished" selectionChange="selectionChange" mode="Delete"
 		delete="onDeleteFile" items="{ path: 'MyFile>/' }">
         <columns>
-            <Column id="FILENAME"  width="350px" demandPopin="true">
+            <Column id="FILENAME"  width="450px" demandPopin="true">
                 <Text text="文件名"/>
             </Column>
-            <Column id="MIMETYPE"  width="200px" demandPopin="true">
+            <!-- <Column id="MIMETYPE"  width="200px" demandPopin="true">
                 <Text text="文件类型"/>
-            </Column>
-            <Column id="SYDATE" width="190px" demandPopin="true">
+            </Column> -->
+            <Column id="SYDATE" width="240px" demandPopin="true">
                 <Text text="上传日期"/>
             </Column>
-            <Column id="SYTIME" width="190px"  demandPopin="true">
+            <Column id="SYTIME" width="240px"  demandPopin="true">
                 <Text text="上传时间"/>
             </Column>
         </columns>
@@ -25,7 +25,7 @@
             <ColumnListItem press="onDisplayItem2" id="cliFile" type="Active">
                 <cells>
                     <Text text="{MyFile>FilenameOld}"/>
-                    <Text text="{MyFile>Mimetype}"/>
+                    <!-- <Text text="{MyFile>Mimetype}"/> -->
                     <Text text="{path: 'MyFile>Sydate',formatter:'.formatDay' }"/>
                     <Text text="{path: 'MyFile>Sytime',formatter:'.formatTime' } "/>
                 </cells>

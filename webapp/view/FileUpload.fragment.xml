@@ -18,7 +18,7 @@
             <f:content>
                 <Label text="电子档案类别" />
                 <Input id="DZDALBUP" value="{onSearch>/DZDALBUP}" submit="DzdamkKSubmit" showValueHelp="true" valueHelpRequest="ValueHelp"
-												editable="{onSearch>/oEditable}"  placeholder="电子档案模块"/>
+												editable="{onSearch>/oEditable}"  placeholder="电子档案类别"/>
             </f:content>
 
             <f:content>
