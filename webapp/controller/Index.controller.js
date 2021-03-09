@@ -243,7 +243,7 @@ sap.ui.define([
         EnddaFilters = [], //结束日期
         IsdelFilters = []; //是否删除
 
-      if (!Util.isNotNull(searchdata.WERKS)) {
+      if (!Util.isNotNull(searchdata.PERNR) && (!Util.isNotNull(searchdata.WERKS))) {
         MessageToast.show("请选择人事范围!", {
           at: "center center"
         });
@@ -251,19 +251,21 @@ sap.ui.define([
       }
 
       // 人事范围过滤器
-      WerkFilters.push(new sap.ui.model.Filter(
-        "Werks",
-        sap.ui.model.FilterOperator.EQ,
-        searchdata.WERKS
-      ));
-      aFilterGroupsFilters.push(new sap.ui.model.Filter(WerkFilters, true));
+      if (Util.isNotNull(searchdata.WERKS)) {
+        WerkFilters.push(new sap.ui.model.Filter(
+          "Werks",
+          sap.ui.model.FilterOperator.EQ,
+          searchdata.WERKS
+        ));
+        aFilterGroupsFilters.push(new sap.ui.model.Filter(WerkFilters, true));
+      }
 
       // 员工工号
       if (Util.isNotNull(searchdata.PERNR)) {
         PernrFilters.push(new sap.ui.model.Filter(
           "Pernr",
           sap.ui.model.FilterOperator.EQ,
-          searchdata.PERNR
+          searchdata.PERNR.trim()
         ));
         aFilterGroupsFilters.push(new sap.ui.model.Filter(PernrFilters, true));
       }
@@ -611,10 +613,10 @@ sap.ui.define([
         } else { //不然就取上i
           var sIndex = element.FilenameOld.indexOf("_");
           var sSecIndex = element.FilenameOld.indexOf('_', sIndex + 1); //获取到第二个_的index
-          if(sSecIndex == -1){ //防止没有第二个_
-                var dzdalb = element.FilenameOld.split("_")[1].split(".")[0];
-          }else{
-               var dzdalb = element.FilenameOld.substring(sIndex + 1, sSecIndex);
+          if (sSecIndex == -1) { //防止没有第二个_
+            var dzdalb = element.FilenameOld.split("_")[1].split(".")[0];
+          } else {
+            var dzdalb = element.FilenameOld.substring(sIndex + 1, sSecIndex);
           }
           var pernr8 = Util.PrefixInteger(element.FilenameOld.substring(0, sIndex), 8);
           element.Filename = pernr8 + '_' + dzdalb + '_' + element.Sydate + filefix;
@@ -678,6 +680,9 @@ sap.ui.define([
         if (file.name.indexOf('_') > -1) {
           var aNamelist = file.name.split('_'); //拆分文件名称获取到第一个_前的工号
           filePernr = aNamelist[0];
+          if (!Util.isNum(filePernr)) {
+            filePernr = "";
+          }
         }
         try {
           if (file) {
@@ -821,11 +826,11 @@ sap.ui.define([
       for (let i = 0; i < oSelectedIndexs.length; i++) {
         var index = oSelectedIndexs[i];
         //之前没有直接预览的地址
-        // var guid = oList[index].Compid;  
-        // window.open("/sap/opu/odata/sap/ZSY_HR_DZDA_SRV/ZSY_HR_FILESet(Guid='" + guid + "',Type='1')/$value");
+        var guid = oList[index].Compid;
+        window.open("/sap/opu/odata/sap/ZSY_HR_COMMON_SH_SRV/ZSY_HR_FILESet(Guid='" + guid + "')/$value");
         //直接用生成的地址
-        var url = oList[index].Zhrdacfdz;
-        window.open('/' + url);
+        // var url = oList[index].Zhrdacfdz;
+        // window.open('/' + url);
       }
     },
     onDelete: function () {

@@ -48,6 +48,16 @@ sap.ui.define([], function () {
 			return Object.keys(groups).map(function (group) {
 				return groups[group];
 			});
+		},
+		//验证全是数字
+		isNum(value) {
+			var n = /^[0-9]*$/;
+			var re = new RegExp(n);
+			if (re.test(value)) {
+				return true;
+			} else {
+				return false;
+			}
 		}
 	};
 });

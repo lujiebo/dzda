@@ -28,7 +28,7 @@
                                 <fb:control>
                                     <!-- <Input id="PERNR" value="{onSearch>/PERNR}"
 							            editable="{onSearch>/oEditable}" placeholder="人员工号" maxLength="8"/> -->
-                                    <Input id="PERNR" value="{onSearch>/PERNR}"  showValueHelp="true" valueHelpRequest="ValueHelp" editable="{onSearch>/oEditable}" placeholder="人员号" />
+                                    <Input required="true" id="PERNR" value="{onSearch>/PERNR}"  showValueHelp="true" valueHelpRequest="ValueHelp" editable="{onSearch>/oEditable}" placeholder="人员号" />
                                 </fb:control>
                             </fb:FilterItem>
                             <fb:FilterItem name="werks"  label="{i18n>TitleWERKS}">
@@ -133,34 +133,40 @@
                             <Text text="{oDzda>Pernr}"></Text>
                         </u:template>
                     </u:Column>
+                    <u:Column width="10rem">
+                        <Label text="{i18n>TitleEname}" />
+                        <u:template>
+                            <Text text="{oDzda>Ename}" wrapping="false" tooltip="{oDzda>Ename}"></Text>
+                        </u:template>
+                    </u:Column>
                     <u:Column width="15rem">
                         <Label text="{i18n>TitleGs}" />
                         <u:template>
-                            <Text text="{oDzda>Zgsms}"></Text>
+                            <Text text="{oDzda>Zgsms}" wrapping="false" tooltip="{oDzda>Zgsms}"></Text>
                         </u:template>
                     </u:Column>
                     <u:Column width="15rem">
                         <Label text="{i18n>TitleBm}" />
                         <u:template>
-                            <Text text="{oDzda>Zbmms}"></Text>
+                            <Text text="{oDzda>Zbmms}" wrapping="false" tooltip="{oDzda>Zbmms}"></Text>
                         </u:template>
                     </u:Column>
                     <u:Column width="30rem">
                         <Label text="{i18n>IndexView.Name}" />
                         <u:template>
-                            <Text text="{oDzda>Zhrdamc}"></Text>
+                            <Text text="{oDzda>Zhrdamc}" wrapping="false" tooltip="{oDzda>Zhrdamc}"></Text>
                         </u:template>
                     </u:Column>
                     <u:Column width="10rem">
                         <Label text="{i18n>TitleDZDAMK}" />
                         <u:template>
-                            <Text text="{oDzda>Zhrmkdesc}"></Text>
+                            <Text text="{oDzda>Zhrmkdesc}" wrapping="false" tooltip="{oDzda>Zhrmkdesc}"></Text>
                         </u:template>
                     </u:Column>
-                    <u:Column width="10rem">
+                    <u:Column width="15rem">
                         <Label text="{i18n>TitleDZDALB}" />
                         <u:template>
-                            <Text text="{oDzda>Zhrdzdalt}"></Text>
+                            <Text text="{oDzda>Zhrdzdalt}" wrapping="false" tooltip="{oDzda>Zhrdzdalt}"></Text>
                         </u:template>
                     </u:Column>
                     <u:Column width="10rem">
