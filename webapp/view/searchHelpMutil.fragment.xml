@@ -1,0 +1,72 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:f="sap.ui.layout.form" xmlns:l="sap.ui.layout">
+	<Dialog title="{/appProperties/f4title}" contentWidth="500px" contentHeight="600px">
+		<content>
+			<Panel expandable="true" expanded="{/appProperties/f4panel}" width="auto">
+				<headerToolbar>
+					<Toolbar height="3rem">
+						<Title text="过滤条件"/>
+					</Toolbar>
+				</headerToolbar>
+				<f:Form editable="true">
+					<f:layout>
+						<f:ResponsiveGridLayout labelSpanL="1" labelSpanM="1" emptySpanL="1" emptySpanM="1" columnsL="2" columnsM="2"/>
+					</f:layout>
+					<f:formContainers>
+						<f:FormContainer>
+							<f:formElements>
+								<f:FormElement>
+									<f:fields>
+										<l:HorizontalLayout>
+											<Label text="{/appProperties/f4title}" width="7rem"/>
+											<Input value="{/searchHelp/KEY1}" submit="onSearch" width="10rem"/>
+										</l:HorizontalLayout>
+									</f:fields>
+								</f:FormElement>
+								<f:FormElement>
+									<f:fields>
+										<l:HorizontalLayout>
+											<Label text="名称" width="7rem"/>
+											<Input value="{/searchHelp/VALUE1}" submit="onSearch" width="10rem"/>
+										</l:HorizontalLayout>
+									</f:fields>
+								</f:FormElement>
+								<!--<f:FormElement>-->
+								<!--	<f:fields>-->
+								<!--		<l:HorizontalLayout>-->
+								<!--			<Label text="最大命中数量" width="7rem"/>-->
+								<!--			<Input value="{/searchHelp/EMaxrecords}" submit="onSearch" width="5rem"/>-->
+								<!--		</l:HorizontalLayout>-->
+								<!--	</f:fields>-->
+								<!--</f:FormElement>-->
+							</f:formElements>
+						</f:FormContainer>
+					</f:formContainers>
+				</f:Form>
+			</Panel>
+			<Table id="MutilTable" items="{/searchHelp/f4h2r}" mode="MultiSelect">
+				<columns>
+					<Column demandPopin="true" width="40%">
+						<Text text="{/appProperties/f4title}"/>
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true" visible="{/appProperties/f4visib}" width="60%">
+						<Text text="{/appProperties/f4title}文本"/>
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem type="Navigation" press="pressEvent">
+						<cells>
+							<Text text="{KEY1}"/>
+							<Text text="{VALUE1}"/>
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</content>
+		<beginButton>
+			<Button text="{i18n>Confirm}" press="onConfirmAction"/>
+		</beginButton>
+		<endButton>
+			<Button text="{i18n>Cancel}" press="onCancelAction"/>
+		</endButton>
+	</Dialog>
+</core:FragmentDefinition>

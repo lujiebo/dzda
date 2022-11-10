@@ -10,7 +10,9 @@ sap.ui.define([
   "com/shunyu/dzda/model/Util",
   "sap/ui/model/json/JSONModel",
   "sap/ui/model/Filter",
-  "sap/ui/core/Fragment"
+  "sap/ui/core/Fragment",
+  "./searchHelpMutil",
+  'sap/m/Token'
 ], function (BaseController,
   Controller,
   UIComponent,
@@ -22,7 +24,9 @@ sap.ui.define([
   Util,
   JSONModel,
   Filter,
-  Fragment) {
+  Fragment,
+  searchHelpMutil,
+  Token) {
   "use strict";
 
   return BaseController.extend("com.shunyu.dzda.controller.Index", {
@@ -43,10 +47,10 @@ sap.ui.define([
     },
     onAfterRendering: function (oEvent) {
       // var clearBtn  = document.querySelectorAll('.customFilter .sapMBtn')[0].id;
-      var goBtnID = document.querySelectorAll('.customFilter .sapMBtn')[1].id;
-      var goBtn = this.byId(goBtnID);
-      goBtn.setText("查询");
-      goBtn.setTooltip("查询");
+      // var goBtnID = document.querySelectorAll('.customFilter .sapMBtn')[1].id;
+      // var goBtn = this.byId(goBtnID);
+      // goBtn.setText("查询");
+      // goBtn.setTooltip("查询");
       // var goBtn = this.byId("application-ZSY_HR_DZDA-display-component---Index--tagfilter-btnGo"); 
       // goBtn.setText("查询");
       // var retBtn = this.byId("__component0---Index--tagfilter-btnClear");
@@ -71,12 +75,17 @@ sap.ui.define([
 
       this.oDataModelPreEntry = this.getOwnerComponent().getModel("ZSY_HR_DZDA_SRV");
       this.oDataModelZCommon = this.getOwnerComponent().getModel("ZCommon");
+      this.oDataModelTY = this.getOwnerComponent().getModel("PreEntry"); //从预入职获取人员
+      this.setModel(this.oDataModelTY, "oTy")
+      this.setModel(this.oDataModelZCommon, "oDzdaTy")
       this._ResourceBundle = this.getModel("i18n").getResourceBundle();
       this._JSONModel = this.getModel();
 
       var onSearchData = models._initialLocalData().onSearchData;
       this.setModel(new JSONModel(onSearchData), "onSearch");
       this.oRouter = UIComponent.getRouterFor(this);
+
+      this._init_Muti();
 
       var gyzt = {
         list: [{
@@ -129,6 +138,61 @@ sap.ui.define([
         }.bind(this)
       });
 
+    },
+    _init_Muti: function () {
+      this.oMultiPERNR = this.getView().byId("PERNR");
+      this.oMultiORG = this.getView().byId("ORG"); //部门
+      this.oMultiPERSG = this.getView().byId("PERSG"); //员工组
+      this.oMultiWERKS = this.getView().byId("WERKS"); //人事范围
+      this.oMultiPERSK = this.getView().byId("PERSK"); //员工子组
+      this.oMultiBTRTL = this.getView().byId("BTRTL"); //人事子范围
+
+      this.oMultiPERNR.addValidator(function (args) {
+        var text = args.text;
+        return new Token({
+          key: text,
+          text: text
+        });
+      });
+      this.oMultiORG.addValidator(function (args) {
+        var text = args.text;
+        return new Token({
+          key: text,
+          text: text
+        });
+      });
+
+      this.oMultiPERSG.addValidator(function (args) {
+        var text = args.text;
+        return new Token({
+          key: text,
+          text: text
+        });
+      });
+
+      this.oMultiWERKS.addValidator(function (args) {
+        var text = args.text;
+        return new Token({
+          key: text,
+          text: text
+        });
+      });
+
+      this.oMultiPERSK.addValidator(function (args) {
+        var text = args.text;
+        return new Token({
+          key: text,
+          text: text
+        });
+      });
+
+      this.oMultiBTRTL.addValidator(function (args) {
+        var text = args.text;
+        return new Token({
+          key: text,
+          text: text
+        });
+      });
     },
     ShowWarning: function (oMessage) {
       if (oMessage != "") {
@@ -225,8 +289,20 @@ sap.ui.define([
     onClear: function () {
       this.getModel("onSearch").setData({});
       this.byId("datePickerTo").setValue("");
-      this.byId("datePickerfrom").setValue("")
+      this.byId("datePickerfrom").setValue("");
+      this.oMultiPERNR.removeAllTokens();
+      this.oMultiORG.removeAllTokens();
+      this.oMultiWERKS.removeAllTokens();
+      this.oMultiBTRTL.removeAllTokens();
+      this.oMultiPERSG.removeAllTokens();
+      this.oMultiPERSK.removeAllTokens();
+      this.getView().byId("isdel").setSelectedKey("false");
     },
+    onSelectRow: function (oEvent) {
+			var oTable = this.getView().byId("table");
+			var oSelectedIndices = oTable.getSelectedIndices();
+			this.getView().byId("SelectedNumber").setText("选中：" + oSelectedIndices.length);
+		},
     // 执行按钮
     onSearch: function (oEvent) {
       var searchdata = this.getModel("onSearch").getData(),
@@ -243,71 +319,150 @@ sap.ui.define([
         EnddaFilters = [], //结束日期
         IsdelFilters = []; //是否删除
 
-      if (!Util.isNotNull(searchdata.PERNR) && (!Util.isNotNull(searchdata.WERKS))) {
-        MessageToast.show("请选择人事范围!", {
+      var pernrSel = this.oMultiPERNR.getTokens().length;
+      var werksSel = this.oMultiWERKS.getTokens().length;
+      var btrtlSel = this.oMultiBTRTL.getTokens().length;
+      var orgSel = this.oMultiORG.getTokens().length;
+      var persgSel = this.oMultiPERSG.getTokens().length;
+      var perskSel = this.oMultiPERSK.getTokens().length;
+
+      if (pernrSel == 0 && werksSel == 0) {
+        MessageToast.show("工号和人事范围必选一个!", {
           at: "center center"
         });
         return;
       }
 
-      // 人事范围过滤器
-      if (Util.isNotNull(searchdata.WERKS)) {
-        WerkFilters.push(new sap.ui.model.Filter(
-          "Werks",
-          sap.ui.model.FilterOperator.EQ,
-          searchdata.WERKS
-        ));
-        aFilterGroupsFilters.push(new sap.ui.model.Filter(WerkFilters, true));
+      if (pernrSel > 0) {
+        for (var i = 0; i < this.oMultiPERNR.getTokens().length; i++) {
+          PernrFilters.push(new sap.ui.model.Filter(
+            "Pernr",
+            sap.ui.model.FilterOperator.EQ,
+            this.oMultiPERNR.getTokens()[i].mProperties.key
+          ));
+        }
+        aFilterGroupsFilters.push(new sap.ui.model.Filter(PernrFilters, false));
       }
 
-      // 员工工号
-      if (Util.isNotNull(searchdata.PERNR)) {
-        PernrFilters.push(new sap.ui.model.Filter(
-          "Pernr",
-          sap.ui.model.FilterOperator.EQ,
-          searchdata.PERNR.trim()
-        ));
-        aFilterGroupsFilters.push(new sap.ui.model.Filter(PernrFilters, true));
-      }
-      //人事子范围
-      if (Util.isNotNull(searchdata.BTRTL)) {
-        BtrtlFilters.push(new sap.ui.model.Filter(
-          "Btrtl",
-          sap.ui.model.FilterOperator.EQ,
-          searchdata.BTRTL
-        ));
-        aFilterGroupsFilters.push(new sap.ui.model.Filter(BtrtlFilters, true));
+      if (werksSel > 0) {
+        for (var i = 0; i < this.oMultiWERKS.getTokens().length; i++) {
+          WerkFilters.push(new sap.ui.model.Filter(
+            "Werks",
+            sap.ui.model.FilterOperator.EQ,
+            this.oMultiWERKS.getTokens()[i].mProperties.key
+          ));
+        }
+        aFilterGroupsFilters.push(new sap.ui.model.Filter(WerkFilters, false));
       }
 
-      //部门组织
-      if (Util.isNotNull(searchdata.ORG)) {
-        OrgFilters.push(new sap.ui.model.Filter(
-          "Orgeh",
-          sap.ui.model.FilterOperator.EQ,
-          searchdata.ORG
-        ));
-        aFilterGroupsFilters.push(new sap.ui.model.Filter(OrgFilters, true));
+      if (btrtlSel > 0) {
+        for (var i = 0; i < this.oMultiBTRTL.getTokens().length; i++) {
+          BtrtlFilters.push(new sap.ui.model.Filter(
+            "Btrtl",
+            sap.ui.model.FilterOperator.EQ,
+            this.oMultiBTRTL.getTokens()[i].mProperties.key
+          ));
+        }
+        aFilterGroupsFilters.push(new sap.ui.model.Filter(BtrtlFilters, false));
       }
 
-      //员工组范围
-      if (Util.isNotNull(searchdata.PERSG)) {
-        PersgFilters.push(new sap.ui.model.Filter(
-          "Persg",
-          sap.ui.model.FilterOperator.EQ,
-          searchdata.PERSG
-        ));
-        aFilterGroupsFilters.push(new sap.ui.model.Filter(PersgFilters, true));
+      if (orgSel > 0) {
+        for (var i = 0; i < this.oMultiORG.getTokens().length; i++) {
+          OrgFilters.push(new sap.ui.model.Filter(
+            "Orgeh",
+            sap.ui.model.FilterOperator.EQ,
+            this.oMultiORG.getTokens()[i].mProperties.key
+          ));
+        }
+        aFilterGroupsFilters.push(new sap.ui.model.Filter(OrgFilters, false));
       }
 
-      //员工子组
-      if (Util.isNotNull(searchdata.PERSK)) {
-        PerskFilters.push(new sap.ui.model.Filter(
-          "Persk",
-          sap.ui.model.FilterOperator.EQ,
-          searchdata.PERSK
-        ));
-        aFilterGroupsFilters.push(new sap.ui.model.Filter(PerskFilters, true));
+      if (persgSel > 0) {
+        for (var i = 0; i < this.oMultiPERSG.getTokens().length; i++) {
+          PersgFilters.push(new sap.ui.model.Filter(
+            "Persg",
+            sap.ui.model.FilterOperator.EQ,
+            this.oMultiPERSG.getTokens()[i].mProperties.key
+          ));
+        }
+        aFilterGroupsFilters.push(new sap.ui.model.Filter(PersgFilters, false));
       }
+
+      if (perskSel > 0) {
+        for (var i = 0; i < this.oMultiPERSK.getTokens().length; i++) {
+          PerskFilters.push(new sap.ui.model.Filter(
+            "Persk",
+            sap.ui.model.FilterOperator.EQ,
+            this.oMultiPERSK.getTokens()[i].mProperties.key
+          ));
+        }
+        aFilterGroupsFilters.push(new sap.ui.model.Filter(PerskFilters, false));
+      }
+
+      // // 人事范围过滤器
+      // if (werksSel > 0) {
+      //   WerkFilters.push(new sap.ui.model.Filter(
+      //     "Werks",
+      //     sap.ui.model.FilterOperator.EQ,
+      //     this.oMultiWERKS.getTokens()[0].mProperties.key
+      //   ));
+      //   WerkFilters.push(new sap.ui.model.Filter(
+      //     "Werks",
+      //     sap.ui.model.FilterOperator.EQ,
+      //     this.oMultiWERKS.getTokens()[1].mProperties.key
+      //   ));
+      //   aFilterGroupsFilters.push(new sap.ui.model.Filter(WerkFilters, false));
+      // }
+
+      // // 员工工号
+      // if (pernrSel > 0) {
+      //   PernrFilters.push(new sap.ui.model.Filter(
+      //     "Pernr",
+      //     sap.ui.model.FilterOperator.EQ,
+      //     searchdata.PERNR.trim()
+      //   ));
+      //   aFilterGroupsFilters.push(new sap.ui.model.Filter(PernrFilters, true));
+      // }
+
+      // //人事子范围
+      // if (Util.isNotNull(searchdata.BTRTL)) {
+      //   BtrtlFilters.push(new sap.ui.model.Filter(
+      //     "Btrtl",
+      //     sap.ui.model.FilterOperator.EQ,
+      //     searchdata.BTRTL
+      //   ));
+      //   aFilterGroupsFilters.push(new sap.ui.model.Filter(BtrtlFilters, true));
+      // }
+
+      // //部门组织
+      // if (Util.isNotNull(searchdata.ORG)) {
+      //   OrgFilters.push(new sap.ui.model.Filter(
+      //     "Orgeh",
+      //     sap.ui.model.FilterOperator.EQ,
+      //     searchdata.ORG
+      //   ));
+      //   aFilterGroupsFilters.push(new sap.ui.model.Filter(OrgFilters, true));
+      // }
+
+      // //员工组范围
+      // if (Util.isNotNull(searchdata.PERSG)) {
+      //   PersgFilters.push(new sap.ui.model.Filter(
+      //     "Persg",
+      //     sap.ui.model.FilterOperator.EQ,
+      //     searchdata.PERSG
+      //   ));
+      //   aFilterGroupsFilters.push(new sap.ui.model.Filter(PersgFilters, true));
+      // }
+
+      // //员工子组
+      // if (Util.isNotNull(searchdata.PERSK)) {
+      //   PerskFilters.push(new sap.ui.model.Filter(
+      //     "Persk",
+      //     sap.ui.model.FilterOperator.EQ,
+      //     searchdata.PERSK
+      //   ));
+      //   aFilterGroupsFilters.push(new sap.ui.model.Filter(PerskFilters, true));
+      // }
 
       //电子档案模块
       if (Util.isNotNull(searchdata.DZDAMK)) {
@@ -378,28 +533,87 @@ sap.ui.define([
         }.bind(this)
       });
     },
-    ValueHelp: function (oEvent) {
+    // 查询条件由单选改为多选 
+    ValueHelpMutil: function (oEvent) {
       this.openBusyDialog();
       var that = this;
       var fcode = this.getfcode(oEvent),
-        sPath = "/ZSY_HR_SH_COMMSet",
+        sPath = "/ZSEARCH_HELPSet",
         oFilters = [],
         oModelName;
 
       var onSearchData = this.getView().getModel("onSearch").oData;
+      var oFramTable = this.getView().byId("MutilTable");
       switch (fcode) {
-        case "PERNR":
-          var EZf4id = "PERNR";
+        // case "PERNR":
+        //   var EZf4id = "PERNR";
+        //   oModelName = "onSearch";
+        //   oFilters.push(new Filter("F4ID", sap.ui.model.FilterOperator.EQ, EZf4id));
+        //   if (onSearchData.WERKS == "") {
+        //     this.ShowMessage(this._ResourceBundle.getText("oCheckErrorF4WerksIsNull"));
+        //     this.oBusyDialog.close();
+        //     return;
+        //   }
+        //   oFilters.push(new Filter("FILTER1", sap.ui.model.FilterOperator.EQ, onSearchData.WERKS));
+        //   this._JSONModel.setProperty("/appProperties/f4title", this._ResourceBundle.getText("TitlePrePernr"));
+        //   this._JSONModel.setProperty("/searchHelp/ModelName", oModelName, false);
+        //   return;
+        case "ORG":
+          var innerFilters = [];
+          var EZf4id = "ORG";
           oModelName = "onSearch";
           oFilters.push(new Filter("F4ID", sap.ui.model.FilterOperator.EQ, EZf4id));
-          if (onSearchData.WERKS == "") {
-            this.ShowMessage(this._ResourceBundle.getText("oCheckErrorF4WerksIsNull"));
+          if (this.oMultiWERKS.getTokens().length == 0) {
+            MessageToast.show(this._ResourceBundle.getText("oCheckErrorF4WerksIsNull"), {
+              at: "center center"
+            });
             this.oBusyDialog.close();
             return;
           }
-          oFilters.push(new Filter("FILTER1", sap.ui.model.FilterOperator.EQ, onSearchData.WERKS));
+
+          for (var i = 0; i < this.oMultiWERKS.getTokens().length; i++) {
+            innerFilters.push(new sap.ui.model.Filter(
+              "FILTER1",
+              sap.ui.model.FilterOperator.EQ,
+              this.oMultiWERKS.getTokens()[i].mProperties.key
+            ));
+          }
+          oFilters.push(new sap.ui.model.Filter(innerFilters, false));
+          this._JSONModel.setProperty("/appProperties/f4title", this._ResourceBundle.getText("TitleORG"));
+          this._JSONModel.setProperty("/searchHelp/ModelName", oModelName, false);
+          break;
+        case "PERNR":
+          var pFilters = [];
+          var EZf4id = "PERNR_PRE";
+          oModelName = "onSearch";
+          if (this.oMultiWERKS.getTokens().length == 0) {
+            MessageToast.show(this._ResourceBundle.getText("oCheckErrorF4WerksIsNull"), {
+              at: "center center"
+            });
+            this.oBusyDialog.close();
+            return;
+          }
+          oFilters.push(new Filter("F4ID", sap.ui.model.FilterOperator.EQ, EZf4id));
+          for (var i = 0; i < this.oMultiWERKS.getTokens().length; i++) {
+            pFilters.push(new sap.ui.model.Filter(
+              "FILTER1",
+              sap.ui.model.FilterOperator.EQ,
+              this.oMultiWERKS.getTokens()[i].mProperties.key
+            ));
+          }
+          oFilters.push(new sap.ui.model.Filter(pFilters, false));
           this._JSONModel.setProperty("/appProperties/f4title", this._ResourceBundle.getText("TitlePrePernr"));
           this._JSONModel.setProperty("/searchHelp/ModelName", oModelName, false);
+          if (oFramTable != undefined) {
+            oFramTable.removeSelections();
+            var oJsonN = {};
+            this.getView().getModel().setProperty("/searchHelp/f4h2r", oJsonN);
+          }
+          this.getView().getModel().setProperty("/appProperties/f4panel", true);
+          this._JSONModel.setProperty("/appProperties/fcode", EZf4id, false);
+          this.oBusyDialog.close();
+          this.openDialogMutil(oEvent);
+          this.getView().setBusy(false);
           break;
         case "WERKS":
           var EZf4id = "WERKS";
@@ -409,14 +623,9 @@ sap.ui.define([
           this._JSONModel.setProperty("/searchHelp/ModelName", oModelName, false);
           break;
         case "BTRTL":
-          var EZf4id = "BTRTL";
+          var EZf4id = "BTRTL_MUTIl";
           oModelName = "onSearch";
           oFilters.push(new Filter("F4ID", sap.ui.model.FilterOperator.EQ, EZf4id));
-          if (onSearchData.WERKS == "") {
-            this.ShowMessage(this._ResourceBundle.getText("oCheckErrorF4WerksIsNull"));
-            this.oBusyDialog.close();
-            return;
-          }
           oFilters.push(new Filter("FILTER1", sap.ui.model.FilterOperator.EQ, onSearchData.WERKS));
           this._JSONModel.setProperty("/appProperties/f4title", this._ResourceBundle.getText("TitleBTRTL"));
           this._JSONModel.setProperty("/searchHelp/ModelName", oModelName, false);
@@ -429,18 +638,123 @@ sap.ui.define([
           this._JSONModel.setProperty("/searchHelp/ModelName", oModelName, false);
           break;
         case "PERSK":
-          var EZf4id = "PERSK";
+          var EZf4id = "PERSK_MUTIL";
           oModelName = "onSearch";
           oFilters.push(new Filter("F4ID", sap.ui.model.FilterOperator.EQ, EZf4id));
-          if (onSearchData.PERSG == "") {
-            this.ShowMessage(this._ResourceBundle.getText("oCheckErrorF4PerskIsNull"));
-            this.oBusyDialog.close();
-            return;
-          }
           oFilters.push(new Filter("FILTER1", sap.ui.model.FilterOperator.EQ, onSearchData.PERSG));
           this._JSONModel.setProperty("/appProperties/f4title", this._ResourceBundle.getText("TitlePERSK"));
           this._JSONModel.setProperty("/searchHelp/ModelName", oModelName, false);
           break;
+      }
+
+      this._JSONModel.setProperty("/appProperties/fcode", EZf4id, false);
+      if (oFramTable != undefined) {
+        oFramTable.removeSelections();
+      }
+      this.getView().getModel().setProperty("/searchHelp/f4h2r", []);
+      if (fcode == "PERNR" || fcode == "ORG") {
+        //从原来电子档案通用的搜索拿
+        sPath = "/ZSY_HR_SH_COMMSet";
+        this.oDataModelZCommon.read(sPath, { //
+          filters: oFilters,
+          success: function (oData, oResponse) {
+
+            var oJson = oData.results;
+            that.getView().getModel().setProperty("/searchHelp/f4h2r", oJson);
+            that.getView().getModel().setSizeLimit(99999);
+
+            that.oBusyDialog.close();
+            that.openDialogMutil(oEvent);
+            that.getView().setBusy(false);
+            // get the f4 id
+            // that.setSelectMutil(that._JSONModel.getProperty("/appProperties/fcode"));					
+          },
+          error: function (error) {
+            that.oBusyDialog.close();
+            that.getView().setBusy(false);
+          }
+        });
+      } else {
+        //从预入职的搜索拿
+        this.oDataModelTY.read(sPath, { //
+          filters: oFilters,
+          success: function (oData, oResponse) {
+
+            var oJson = oData.results;
+            that.getView().getModel().setProperty("/searchHelp/f4h2r", oJson);
+            that.getView().getModel().setSizeLimit(99999);
+
+            that.oBusyDialog.close();
+            that.openDialogMutil(oEvent);
+            that.getView().setBusy(false);
+            // get the f4 id
+            // that.setSelectMutil(that._JSONModel.getProperty("/appProperties/fcode"));					
+          },
+          error: function (error) {
+            that.oBusyDialog.close();
+            that.getView().setBusy(false);
+          }
+        });
+      }
+    },
+    openDialogMutil: function (oEvent) {
+
+      if (!this._nonCRMutil) {
+        this._nonCRMutil = new searchHelpMutil(this.getView());
+      }
+      this._nonCRMutil.openDialog(oEvent);
+      // this.setBusy(false);
+    },
+    ValueHelp: function (oEvent) {
+      this.openBusyDialog();
+      var that = this;
+      var fcode = this.getfcode(oEvent),
+        sPath = "/ZSY_HR_SH_COMMSet",
+        oFilters = [],
+        oModelName;
+
+      var onSearchData = this.getView().getModel("onSearch").oData;
+      switch (fcode) {
+        // case "WERKS":
+        //   var EZf4id = "WERKS";
+        //   oModelName = "onSearch";
+        //   oFilters.push(new Filter("F4ID", sap.ui.model.FilterOperator.EQ, EZf4id));
+        //   this._JSONModel.setProperty("/appProperties/f4title", this._ResourceBundle.getText("TitleWERKS"));
+        //   this._JSONModel.setProperty("/searchHelp/ModelName", oModelName, false);
+        //   break;
+        // case "BTRTL":
+        //   var EZf4id = "BTRTL";
+        //   oModelName = "onSearch";
+        //   oFilters.push(new Filter("F4ID", sap.ui.model.FilterOperator.EQ, EZf4id));
+        //   if (onSearchData.WERKS == "") {
+        //     this.ShowMessage(this._ResourceBundle.getText("oCheckErrorF4WerksIsNull"));
+        //     this.oBusyDialog.close();
+        //     return;
+        //   }
+        //   oFilters.push(new Filter("FILTER1", sap.ui.model.FilterOperator.EQ, onSearchData.WERKS));
+        //   this._JSONModel.setProperty("/appProperties/f4title", this._ResourceBundle.getText("TitleBTRTL"));
+        //   this._JSONModel.setProperty("/searchHelp/ModelName", oModelName, false);
+        //   break;
+        // case "PERSG":
+        //   var EZf4id = "PERSG";
+        //   oModelName = "onSearch";
+        //   oFilters.push(new Filter("F4ID", sap.ui.model.FilterOperator.EQ, EZf4id));
+        //   this._JSONModel.setProperty("/appProperties/f4title", this._ResourceBundle.getText("TitlePERSG"));
+        //   this._JSONModel.setProperty("/searchHelp/ModelName", oModelName, false);
+        //   break;
+        // case "PERSK":
+        //   var EZf4id = "PERSK";
+        //   oModelName = "onSearch";
+        //   oFilters.push(new Filter("F4ID", sap.ui.model.FilterOperator.EQ, EZf4id));
+        //   if (onSearchData.PERSG == "") {
+        //     this.ShowMessage(this._ResourceBundle.getText("oCheckErrorF4PerskIsNull"));
+        //     this.oBusyDialog.close();
+        //     return;
+        //   }
+        //   oFilters.push(new Filter("FILTER1", sap.ui.model.FilterOperator.EQ, onSearchData.PERSG));
+        //   this._JSONModel.setProperty("/appProperties/f4title", this._ResourceBundle.getText("TitlePERSK"));
+        //   this._JSONModel.setProperty("/searchHelp/ModelName", oModelName, false);
+        //   break;
         case "DZDAMK":
           var EZf4id = "DZDAMK";
           oModelName = "onSearch";
@@ -479,19 +793,6 @@ sap.ui.define([
           }
           oFilters.push(new Filter("FILTER1", sap.ui.model.FilterOperator.EQ, onSearchData.DZDAMKUP));
           this._JSONModel.setProperty("/appProperties/f4title", this._ResourceBundle.getText("TitleDZDALB"));
-          this._JSONModel.setProperty("/searchHelp/ModelName", oModelName, false);
-          break;
-        case "ORG":
-          var EZf4id = "ORG";
-          oModelName = "onSearch";
-          oFilters.push(new Filter("F4ID", sap.ui.model.FilterOperator.EQ, EZf4id));
-          if (onSearchData.WERKS == "") {
-            this.ShowMessage(this._ResourceBundle.getText("oCheckErrorF4WerksIsNull"));
-            this.oBusyDialog.close();
-            return;
-          }
-          oFilters.push(new Filter("FILTER1", sap.ui.model.FilterOperator.EQ, onSearchData.WERKS));
-          this._JSONModel.setProperty("/appProperties/f4title", this._ResourceBundle.getText("TitleORG"));
           this._JSONModel.setProperty("/searchHelp/ModelName", oModelName, false);
           break;
       }
