@@ -36,6 +36,15 @@
                             </f:FormContainer>
                             <f:FormContainer>
                                 <f:formElements>
+                                    <f:FormElement label="{i18n>nachn}">
+                                        <f:fields>
+                                         <Input id="ename" value="{onSearch>/ename}"   placeholder="{i18n>nachn}"/>
+                                        </f:fields>
+                                    </f:FormElement>
+                                </f:formElements>
+                            </f:FormContainer>
+                            <f:FormContainer>
+                                <f:formElements>
                                     <f:FormElement label="{i18n>IndexView.Werks}">
                                         <f:fields>
                                             <MultiInput id="WERKS"  showValueHelp="true" valueHelpRequest="ValueHelpMutil" placeholder="{i18n>IndexView.Werks}"/>

@@ -317,7 +317,8 @@ sap.ui.define([
         DzdalbFilters = [], //电子档案类别
         BegdaFilters = [], //开始日期
         EnddaFilters = [], //结束日期
-        IsdelFilters = []; //是否删除
+        IsdelFilters = [], //是否删除
+        EnameFilters = []; //员工姓名
 
       var pernrSel = this.oMultiPERNR.getTokens().length;
       var werksSel = this.oMultiWERKS.getTokens().length;
@@ -325,9 +326,14 @@ sap.ui.define([
       var orgSel = this.oMultiORG.getTokens().length;
       var persgSel = this.oMultiPERSG.getTokens().length;
       var perskSel = this.oMultiPERSK.getTokens().length;
+      var ename =  searchdata.ename;
 
-      if (pernrSel == 0 && werksSel == 0) {
-        MessageToast.show("工号和人事范围必选一个!", {
+      if( ename == undefined) {
+        ename = "";
+      }
+
+      if (pernrSel == 0 && werksSel == 0 && ename.trim().length == 0 ) {
+        MessageToast.show("工号、人事范围或员工姓名必输一个!", {
           at: "center center"
         });
         return;
@@ -353,6 +359,15 @@ sap.ui.define([
           ));
         }
         aFilterGroupsFilters.push(new sap.ui.model.Filter(WerkFilters, false));
+      }
+
+      if ( ename.trim().length > 0 ){
+        EnameFilters.push(new sap.ui.model.Filter(
+          "Ename",
+          sap.ui.model.FilterOperator.EQ,
+          ename.trim()
+        ));
+        aFilterGroupsFilters.push(new sap.ui.model.Filter(EnameFilters, true));
       }
 
       if (btrtlSel > 0) {
